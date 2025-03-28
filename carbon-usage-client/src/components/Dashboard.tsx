@@ -1,6 +1,9 @@
+import { useState } from 'react';
 import UserForm from './ui/userForm';
 
 export default function Dashboard() {
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [userName, setUsername] = useState('');
   return (
     <div className="flex h-screen">
       <aside className="w-64 bg-gray-900 text-white p-4 flex flex-col">
@@ -9,9 +12,16 @@ export default function Dashboard() {
 
       <div className="flex-1 flex flex-col">
         <header className="bg-gray-800 text-white p-4 flex items-center justify-between">
-          <h2 className="text-lg font-semibold">Welcome</h2>
+          <h2 className="text-lg font-semibold">
+            Welcome {isAuthenticated ? userName : ''}
+            {/* TO ADD A USE CONTEXT TO SHARE THE USER NAME */}
+          </h2>
           <div className="ml-auto">
-            <UserForm />
+            <UserForm
+              setIsAuthenticated={setIsAuthenticated}
+              setUsername={setUsername}
+              isAuthenticated={isAuthenticated}
+            />
           </div>
         </header>
 
