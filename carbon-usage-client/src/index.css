@@ -1,5 +1,9 @@
+/* src/index.css or global.css */
+@import 'tailwindcss/preflight';
+@tailwind utilities;
 @import 'tailwindcss';
-@import "tw-animate-css";
+@import 'tw-animate-css';
+@source "../node_modules/@my-company/ui-lib";
 
 @custom-variant dark (&:is(.dark *));
 

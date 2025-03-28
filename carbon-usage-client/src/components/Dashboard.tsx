@@ -1,5 +1,6 @@
 import { Button } from '@/components/ui/button';
 import { Menu } from 'lucide-react';
+import UserForm from './UserForm';
 
 export default function Dashboard() {
   const handleButtonClick = () => {
@@ -23,6 +24,7 @@ export default function Dashboard() {
           <Button variant="ghost" className="text-left">
             Settings
           </Button>
+          <UserForm />
         </nav>
       </aside>
 
