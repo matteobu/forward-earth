@@ -1,15 +1,11 @@
 import './App.css';
-import UserForm from './components/UserForm';
+import Dashboard from './components/Dashboard';
 
 function App() {
   return (
-    <>
-      <h1>
-        This is the very beginning of my Forward Earth APP (FEA) Carbon Usage
-        Tracker
-      </h1>
-      <UserForm />
-    </>
+    <div className="h-screen flex flex-col w-screen">
+      <Dashboard />
+    </div>
   );
 }
 
