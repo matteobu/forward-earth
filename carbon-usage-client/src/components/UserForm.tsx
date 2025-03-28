@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Input } from '@headlessui/react';
 
 const UserForm = () => {
   const [name, setName] = useState('');
@@ -32,45 +33,35 @@ const UserForm = () => {
   return (
     <form
       onSubmit={handleSubmit}
-      className="max-w-lg mx-auto p-6 bg-red-400 shadow-lg rounded-lg"
+      className="flex items-center gap-4  bg-gray-800 rounded-md max-w-2xl mx-auto"
     >
-      <div className="mb-4">
-        <label
-          htmlFor="name"
-          className="block text-gray-700 font-semibold mb-2"
-        >
-          Name:
-        </label>
-        <input
+      <div className="flex flex-col gap-2">
+        <Input
           id="name"
           type="text"
+          placeholder="name"
           value={name}
           onChange={(e) => setName(e.target.value)}
           required
-          className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
+          className="p-2 text-sm rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500"
         />
       </div>
 
-      <div className="mb-4">
-        <label
-          htmlFor="email"
-          className="block text-gray-700 font-semibold mb-2"
-        >
-          Email:
-        </label>
-        <input
+      <div className="flex flex-col gap-2">
+        <Input
           id="email"
           type="email"
+          placeholder="email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           required
-          className="w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500"
+          className="p-2 text-sm rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500"
         />
       </div>
 
       <button
         type="submit"
-        className="w-full py-3 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+        className="py-2 px-4 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500"
       >
         Submit
       </button>

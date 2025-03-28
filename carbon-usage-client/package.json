@@ -10,8 +10,8 @@
     "preview": "vite preview"
   },
   "dependencies": {
+    "@headlessui/react": "^2.2.0",
     "@radix-ui/react-slot": "^1.1.2",
-    "@shadcn/ui": "^0.0.4",
     "@tailwindcss/postcss": "^4.0.17",
     "@tailwindcss/vite": "^4.0.17",
     "class-variance-authority": "^0.7.1",
