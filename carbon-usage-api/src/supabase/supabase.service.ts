@@ -1,95 +1,46 @@
-import { Injectable, UnauthorizedException } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { createClient } from '@supabase/supabase-js';
-import * as jwt from 'jsonwebtoken';
-import { config } from 'dotenv';
+import { User } from 'src/users/entities/user.entity';
+import * as dotenv from 'dotenv';
 
-config();
-
-interface UserPayload {
-  sub: string;
-  email: string;
-  exp?: number;
-  iat?: number;
-}
+dotenv.config();
 
 @Injectable()
 export class SupabaseService {
-  private supabase: ReturnType<typeof createClient>;
+  private supabase;
 
   constructor() {
-    const supabaseUrl = process.env.SUPABASE_URL;
-    const supabaseKey = process.env.SUPABASE_KEY;
-
-    if (!supabaseUrl || !supabaseKey) {
-      throw new Error('Supabase configuration is incomplete');
-    }
-
-    this.supabase = createClient(supabaseUrl, supabaseKey);
+    // Initialize Supabase client
+    this.supabase = createClient(
+      process.env.SUPABASE_URL || '',
+      process.env.SUPABASE_KEY || '',
+    );
   }
 
-  async findUserByEmail(email: string) {
+  // Function to get user from Supabase by email
+  async getUserByEmail(email: string) {
     const { data, error } = await this.supabase
       .from('Users')
       .select('*')
       .eq('email', email)
       .single();
 
-    if (error || !data) {
-      return null;
+    if (error) {
+      throw new Error('Error fetching user from Supabase');
     }
-
-    return data;
+    return data as User;
   }
 
-  async insertUser(name: string, email: string) {
+  // Function to create a user if not exists
+  async createUser(name: string, email: string) {
     const { data, error } = await this.supabase
-      .from('Users')
+      .from('Users') // Replace 'users' with your actual table name
       .insert([{ name, email }])
-      .select();
+      .single();
 
-    if (error || !data) {
-      throw new Error(`User insertion failed: ${error?.message}`);
+    if (error) {
+      throw new Error('Error creating user in Supabase');
     }
-
-    return data[0];
-  }
-
-  createJWT(user: { id: string; email: string }) {
-    const secretKey = process.env.JWT_SECRET_KEY;
-    if (!secretKey) {
-      throw new Error('JWT secret is not configured');
-    }
-
-    const payload: UserPayload = {
-      sub: user.id,
-      email: user.email,
-    };
-
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-return
-    return jwt.sign(payload, secretKey, {
-      expiresIn: '60m',
-      algorithm: 'HS256',
-    });
-  }
-
-  verifyJWT(token: string): UserPayload {
-    const secretKey = process.env.JWT_SECRET_KEY;
-    if (!secretKey) {
-      throw new Error('JWT secret is not configured');
-    }
-
-    try {
-      return jwt.verify(token, secretKey, {
-        algorithms: ['HS256'],
-      }) as UserPayload;
-    } catch (error) {
-      if (error instanceof jwt.TokenExpiredError) {
-        throw new UnauthorizedException('Token has expired');
-      }
-      if (error instanceof jwt.JsonWebTokenError) {
-        throw new UnauthorizedException('Invalid token');
-      }
-      throw new UnauthorizedException('Authentication failed');
-    }
+    return data as User;
   }
 }
