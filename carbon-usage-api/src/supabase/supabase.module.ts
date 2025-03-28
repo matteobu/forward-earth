@@ -1,4 +1,3 @@
-// supabase.module.ts
 import { Module } from '@nestjs/common';
 import { SupabaseService } from './supabase.service';
 
