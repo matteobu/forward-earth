@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { Input } from '@headlessui/react';
 
 const UserForm = () => {
   const [name, setName] = useState('');
@@ -30,26 +31,40 @@ const UserForm = () => {
   };
 
   return (
-    <form onSubmit={handleSubmit}>
-      <div>
-        <label>Name:</label>
-        <input
+    <form
+      onSubmit={handleSubmit}
+      className="flex items-center gap-4  bg-gray-800 rounded-md max-w-2xl mx-auto"
+    >
+      <div className="flex flex-col gap-2">
+        <Input
+          id="name"
           type="text"
+          placeholder="name"
           value={name}
           onChange={(e) => setName(e.target.value)}
           required
+          className="p-2 text-sm rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500"
         />
       </div>
-      <div>
-        <label>Email:</label>
-        <input
+
+      <div className="flex flex-col gap-2">
+        <Input
+          id="email"
           type="email"
+          placeholder="email"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           required
+          className="p-2 text-sm rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500"
         />
       </div>
-      <button type="submit">Submit</button>
+
+      <button
+        type="submit"
+        className="py-2 px-4 bg-indigo-600 text-white rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+      >
+        Submit
+      </button>
     </form>
   );
 };
