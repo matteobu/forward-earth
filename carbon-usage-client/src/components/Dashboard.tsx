@@ -1,4 +1,4 @@
-import UserForm from './UserForm';
+import UserForm from './ui/userForm';
 
 export default function Dashboard() {
   return (
@@ -10,7 +10,9 @@ export default function Dashboard() {
       <div className="flex-1 flex flex-col">
         <header className="bg-gray-800 text-white p-4 flex items-center justify-between">
           <h2 className="text-lg font-semibold">Welcome</h2>
-          <UserForm />
+          <div className="ml-auto">
+            <UserForm />
+          </div>
         </header>
 
         <main className="flex-1 p-6 bg-gray-100">
