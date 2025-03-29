@@ -44,7 +44,7 @@ export class AuthController {
     }
 
     try {
-      const user = await this.authService.verifyToken(token);
+      const user = await this.authService.verifyToken(token as string);
       console.log('User verified:', user);
       return { user };
     } catch (error) {
