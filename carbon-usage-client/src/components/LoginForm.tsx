@@ -14,13 +14,8 @@ const LoginForm: React.FC = () => {
     try {
       const response = await fetch('http://localhost:3000/auth/login', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          name,
-          email,
-        }),
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, name }),
         credentials: 'include',
       });
 
@@ -28,8 +23,7 @@ const LoginForm: React.FC = () => {
         throw new Error('Login failed');
       }
 
-      const data = await response.json();
-      login(data.token); // Assuming the token is returned in 'data.token'
+      login();
       navigate('/dashboard');
     } catch (error) {
       console.error('Login failed', error);
