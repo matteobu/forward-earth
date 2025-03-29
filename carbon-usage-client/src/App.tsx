@@ -36,7 +36,7 @@ const App: React.FC = () => {
             <Route path="/login" element={<AuthRedirect />} />
 
             <Route
-              path="/dashboard"
+              path="/dashboard/*"
               element={<ProtectedRoute element={<Dashboard />} />}
             />
 

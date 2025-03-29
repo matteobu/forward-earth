@@ -18,7 +18,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   const [user, setUser] = useState<User | null>(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [loading, setLoading] = useState(true);
-  const { setName } = useUser();
+  const { setUserContext } = useUser();
 
   const checkAuthStatus = async () => {
     try {
@@ -29,8 +29,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 
       if (response.ok) {
         const data = await response.json();
+        
         setUser(data.user);
-        setName(data.user.name);
+        setUserContext(data.user);
+
         setIsAuthenticated(true);
         console.log('User authenticated:', data.user);
       } else {

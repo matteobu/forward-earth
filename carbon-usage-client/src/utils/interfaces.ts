@@ -6,7 +6,21 @@ export interface AuthContextType {
   logout: () => void;
 }
 export interface User {
-  id: string;
+  userId: number;
   email: string;
   name: string;
+}
+
+export interface FormData {
+  amount: string;
+  activityTypeId: string;
+  unitId: string;
+  date: string;
+}
+
+export interface ChangeEvent {
+  target: {
+    name: keyof FormData;
+    value: string;
+  };
 }
