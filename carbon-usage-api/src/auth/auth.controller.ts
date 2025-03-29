@@ -1,18 +1,67 @@
-import { Controller, Get, Post, Body } from '@nestjs/common';
+import {
+  Controller,
+  Post,
+  Get,
+  Req,
+  Res,
+  Body,
+  UnauthorizedException,
+} from '@nestjs/common';
 import { AuthService } from './auth.service';
+import { Request, Response } from 'express';
 
 @Controller('auth')
 export class AuthController {
   constructor(private readonly authService: AuthService) {}
 
-  @Get('test')
-  testRoute() {
-    return { message: 'Test route hit' }; // A simple test message
+  @Post('login')
+  async login(@Body() { email, name }, @Res() res: Response) {
+    try {
+      const result = await this.authService.validateUser(email, name, res);
+
+      res.cookie('jwt', result.token, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'lax',
+        maxAge: 60 * 60 * 1000,
+        path: '/',
+      });
+
+      return res.json({ user: result.user });
+    } catch (error) {
+      console.error('Login error:', error);
+      throw new UnauthorizedException('Invalid email or password');
+    }
   }
 
-  @Post('login')
-  async login(@Body() { email, name }) {
-    const result = await this.authService.validateUser(email, name);
-    return result; // Returns user info and JWT token
+  @Get('me')
+  async getProfile(@Req() req: Request) {
+    console.log('Cookies received:', req.cookies);
+    const token = req.cookies['jwt'];
+    console.log('JWT token found:', token ? 'Yes' : 'No');
+    if (!token) {
+      throw new UnauthorizedException('Not authenticated');
+    }
+
+    try {
+      const user = await this.authService.verifyToken(token);
+      console.log('User verified:', user);
+      return { user };
+    } catch (error) {
+      console.error('Token verification error:', error);
+      throw new UnauthorizedException('Invalid token');
+    }
+  }
+
+  @Post('logout')
+  logout(@Res() res: Response) {
+    res.clearCookie('jwt', {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      path: '/',
+    });
+
+    res.json({ message: 'Logged out successfully' });
   }
 }

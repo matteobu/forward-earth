@@ -10,6 +10,21 @@ import Dashboard from './components/Dashboard';
 import { AuthProvider } from './contexts/AuthContext';
 import { UserProvider } from './contexts/UserContext';
 import ProtectedRoute from './components/ProtectedRoute';
+import { useAuth } from './contexts/AuthContext';
+
+const AuthRedirect = () => {
+  const { isAuthenticated, loading } = useAuth();
+
+  if (loading) {
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
+      </div>
+    );
+  }
+
+  return isAuthenticated ? <Navigate to="/dashboard" /> : <LoginForm />;
+};
 
 const App: React.FC = () => {
   return (
@@ -17,14 +32,14 @@ const App: React.FC = () => {
       <UserProvider>
         <Router>
           <Routes>
-            <Route path="/" element={<LoginForm />} />
-            <Route path="/login" element={<LoginForm />} />
-            {/* Wrap the protected component */}
+            <Route path="/" element={<AuthRedirect />} />
+            <Route path="/login" element={<AuthRedirect />} />
+
             <Route
               path="/dashboard"
               element={<ProtectedRoute element={<Dashboard />} />}
             />
-            {/* Fallback route */}
+
             <Route path="*" element={<Navigate to="/" />} />
           </Routes>
         </Router>
