@@ -29,16 +29,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 
       if (response.ok) {
         const data = await response.json();
-        
+
         setUser(data.user);
         setUserContext(data.user);
 
         setIsAuthenticated(true);
-        console.log('User authenticated:', data.user);
       } else {
         setUser(null);
         setIsAuthenticated(false);
-        console.log('User not authenticated');
       }
     } catch (error) {
       console.error('Failed to check auth status', error);

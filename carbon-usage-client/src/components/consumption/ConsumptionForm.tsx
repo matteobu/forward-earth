@@ -65,7 +65,6 @@ export default function ConsumptionForm() {
       unit: selectedActivity?.unit,
     };
 
-    console.log('Submitted data:', submissionData);
     try {
       const response = await fetch('http://localhost:3000/consumption/create', {
         method: 'POST',

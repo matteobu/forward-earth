@@ -55,13 +55,11 @@ export class SupabaseService {
     const { data, error } = await this.supabase
       .from('ConsumptionTable')
       .select('*')
-      .eq('user_id', user_id)
-      .single();
+      .eq('user_id', user_id);
 
     if (error) {
       throw new Error('Error fetching user from Supabase');
     }
-
     return data as Consumption;
   }
 
@@ -81,8 +79,6 @@ export class SupabaseService {
       .select('id')
       .single();
 
-    console.log('Unit inserted:', unitData);
-    console.log('Before inserting UnitType');
     if (unitError) {
       throw new Error(`Error creating unit: ${unitError.message}`);
     }
@@ -131,7 +127,6 @@ export class SupabaseService {
         },
       ])
       .select();
-    console.log('Consumption inserted:', data);
 
     if (error) {
       throw new Error(`Error creating consumption: ${error.message}`);

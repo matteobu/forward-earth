@@ -2,6 +2,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useUser } from '../contexts/UserContext';
 import { Routes, Route, Link } from 'react-router-dom';
 import ConsumptionForm from './consumption/ConsumptionForm';
+import ConsumptionList from './consumption/ConsumptionList';
 
 export default function Dashboard() {
   const { logout } = useAuth();
@@ -15,10 +16,10 @@ export default function Dashboard() {
             Home
           </Link>
           <Link
-            to="/dashboard/consumptions"
+            to="/dashboard/consumptions/list"
             className="py-2 px-4 hover:bg-gray-800 rounded"
           >
-            Consumption
+            Consumptions List
           </Link>
           <Link
             to="/dashboard/consumptions/new"
@@ -43,7 +44,7 @@ export default function Dashboard() {
         <main className="flex-1 p-6 bg-gray-100 overflow-auto">
           <Routes>
             <Route index element={<DashboardHome />} />
-            {/* <Route path="consumptions" element={<ConsumptionList />} /> */}
+            <Route path="consumptions/list" element={<ConsumptionList />} />
             <Route path="consumptions/new" element={<ConsumptionForm />} />
             <Route path="consumptions/:id/edit" element={<ConsumptionForm />} />
           </Routes>
