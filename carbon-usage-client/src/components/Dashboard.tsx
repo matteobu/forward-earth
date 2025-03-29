@@ -1,4 +1,10 @@
+import { useAuth } from '@/contexts/AuthContext';
+import { useUser } from '../contexts/UserContext';
+
 export default function Dashboard() {
+  const { logout } = useAuth();
+  const { name } = useUser();
+
   return (
     <div className="flex h-screen w-screen">
       <aside className="w-64 bg-gray-900 text-white p-4 flex flex-col">
@@ -7,10 +13,10 @@ export default function Dashboard() {
 
       <div className="flex-1 flex flex-col">
         <header className="bg-gray-800 text-white p-4 flex items-center justify-between">
-          <h2 className="text-lg font-semibold">
-            Welcome ""
-            {/* TO ADD A USE CONTEXT TO SHARE THE USER NAME */}
-          </h2>
+          <h2 className="text-lg font-semibold">Welcome {name}</h2>
+          <button className="bg-red-400" onClick={logout}>
+            LOGOUT
+          </button>
         </header>
 
         <main className="flex-1 p-6 bg-gray-100">

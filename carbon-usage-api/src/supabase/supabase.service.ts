@@ -34,7 +34,7 @@ export class SupabaseService {
   // Function to create a user if not exists
   async createUser(name: string, email: string) {
     const { data, error } = await this.supabase
-      .from('Users') // Replace 'users' with your actual table name
+      .from('Users')
       .insert([{ name, email }])
       .single();
 

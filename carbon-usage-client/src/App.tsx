@@ -28,8 +28,8 @@ const AuthRedirect = () => {
 
 const App: React.FC = () => {
   return (
-    <AuthProvider>
-      <UserProvider>
+    <UserProvider>
+      <AuthProvider>
         <Router>
           <Routes>
             <Route path="/" element={<AuthRedirect />} />
@@ -43,8 +43,8 @@ const App: React.FC = () => {
             <Route path="*" element={<Navigate to="/" />} />
           </Routes>
         </Router>
-      </UserProvider>
-    </AuthProvider>
+      </AuthProvider>
+    </UserProvider>
   );
 };
 

@@ -1,4 +1,5 @@
 import { AuthContextType, User } from '@/utils/interfaces';
+import { useUser } from './UserContext';
 import React, { createContext, useContext, useEffect, useState } from 'react';
 
 const AuthContext = createContext<AuthContextType | null>(null);
@@ -17,6 +18,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   const [user, setUser] = useState<User | null>(null);
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [loading, setLoading] = useState(true);
+  const { setName } = useUser();
 
   const checkAuthStatus = async () => {
     try {
@@ -28,6 +30,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       if (response.ok) {
         const data = await response.json();
         setUser(data.user);
+        setName(data.user.name);
         setIsAuthenticated(true);
         console.log('User authenticated:', data.user);
       } else {
@@ -62,13 +65,15 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
       if (response.ok) {
         console.log('Logout successful');
       } else {
-        console.error('Logout failed');
+        console.error('Logout failed on server');
       }
     } catch (error) {
       console.error('Error during logout:', error);
     } finally {
       setUser(null);
       setIsAuthenticated(false);
+
+      window.location.href = '/login';
     }
   };
 
