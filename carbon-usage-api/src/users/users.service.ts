@@ -1,3 +1,4 @@
+// users.service.ts
 import { Injectable } from '@nestjs/common';
 import { SupabaseService } from '../supabase/supabase.service';
 import { User } from './entities/user.entity';
