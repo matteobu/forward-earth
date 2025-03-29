@@ -24,3 +24,25 @@ export interface ChangeEvent {
     value: string;
   };
 }
+
+// SIDE BAR INTERFACES
+export interface SidebarProps {
+  className?: string;
+}
+
+interface NavItemBase {
+  title: string;
+  icon: React.ReactNode;
+  path?: string;
+}
+
+export interface NavItem extends NavItemBase {
+  children?: NavItem[];
+}
+
+interface DividerItem {
+  divider: true;
+  heading?: string;
+}
+
+export type NavItemOrDivider = NavItem | DividerItem;

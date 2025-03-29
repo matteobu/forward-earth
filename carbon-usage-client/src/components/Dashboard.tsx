@@ -1,8 +1,9 @@
 import { useAuth } from '@/contexts/AuthContext';
 import { useUser } from '../contexts/UserContext';
-import { Routes, Route, Link } from 'react-router-dom';
+import { Routes, Route } from 'react-router-dom';
 import ConsumptionForm from './consumption/ConsumptionForm';
 import ConsumptionList from './consumption/ConsumptionList';
+import Sidebar from './Sidebar';
 
 export default function Dashboard() {
   const { logout } = useAuth();
@@ -11,23 +12,7 @@ export default function Dashboard() {
   return (
     <div className="flex h-screen w-screen">
       <aside className="w-64 bg-gray-900 text-white p-4 flex flex-col">
-        <nav className="flex flex-col gap-2 mt-3">
-          <Link to="/dashboard" className="py-2 px-4 hover:bg-gray-800 rounded">
-            Home
-          </Link>
-          <Link
-            to="/dashboard/consumptions/list"
-            className="py-2 px-4 hover:bg-gray-800 rounded"
-          >
-            Consumptions List
-          </Link>
-          <Link
-            to="/dashboard/consumptions/new"
-            className="py-2 px-4 hover:bg-gray-800 rounded"
-          >
-            Add Consumption{' '}
-          </Link>
-        </nav>
+        <Sidebar />
       </aside>
 
       <div className="flex-1 flex flex-col">

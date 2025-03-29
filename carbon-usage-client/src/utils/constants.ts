@@ -60,3 +60,5 @@ export const ACTIVITY_TYPES: ActivityType[] = [
     co2: 70,
   }, // 70 kg CO2 per kWh of battery capacity
 ];
+
+// SIDE BAR CONSTANTS

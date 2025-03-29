@@ -89,7 +89,7 @@ export default function ConsumptionForm() {
       console.error('Failed to create consumption', error);
     }
 
-    navigate('/dashboard/consumptions');
+    navigate('/dashboard/consumptions/list');
   };
 
   return (
