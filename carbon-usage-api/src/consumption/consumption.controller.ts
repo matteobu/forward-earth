@@ -2,6 +2,7 @@ import {
   Controller,
   Get,
   Post,
+  Patch,
   Body,
   Param,
   Delete,
@@ -9,14 +10,17 @@ import {
   HttpException,
 } from '@nestjs/common';
 import { ConsumptionService } from './consumption.service';
-import { CreateConsumptionDto } from './dto/create-consumption.dto';
+import {
+  CreateConsumptionDto,
+  PatchConsumptionDto,
+} from './dto/create-consumption.dto';
 import { Consumption } from './entities/consumption.entity';
 
 @Controller('consumption')
 export class ConsumptionController {
   constructor(private readonly consumptionService: ConsumptionService) {}
 
-  @Get(':id')
+  @Get(':id') // Get all consumptions based on the user_id
   async getConsumptionInfo(@Param('id') user_id: number) {
     const consumption: Consumption[] =
       await this.consumptionService.getUserConsumption(user_id);
@@ -43,19 +47,35 @@ export class ConsumptionController {
     }
   }
 
-  @Get()
-  findAll() {
-    return this.consumptionService.findAll();
-  }
-
-  @Get(':id')
-  findOne(@Param('id') id: string) {
-    return this.consumptionService.findOne(+id);
-  }
-
   @Delete('delete/:id')
-  remove(@Param('id') id: string) {
+  async remove(@Param('id') id: string) {
     console.log('REQUEST RECEIVED WITH ID:', id);
     return this.consumptionService.remove(+id);
+  }
+
+  @Patch('patch/:id')
+  async patch(
+    @Param('id') id: string,
+    @Body() patchConsumptionDto: PatchConsumptionDto,
+  ) {
+    try {
+      const result = await this.consumptionService.patch(
+        +id,
+        patchConsumptionDto,
+      );
+
+      return {
+        message: 'Consumption edited successfully',
+        data: result,
+      };
+    } catch (error) {
+      throw new HttpException(
+        {
+          message: 'Failed to edit consumption',
+          error: error.message,
+        },
+        HttpStatus.BAD_REQUEST,
+      );
+    }
   }
 }
