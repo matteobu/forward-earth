@@ -16,3 +16,14 @@ export type Consumption = {
   created_at: string;
   unit_name: string;
 };
+
+export type Unit = {
+  id: number;
+  name: string;
+};
+
+export interface ConsumptionPatchPayload extends Partial<Consumption> {
+  activity_type_name?: string;
+  emission_factor?: number;
+  unit?: string;
+}

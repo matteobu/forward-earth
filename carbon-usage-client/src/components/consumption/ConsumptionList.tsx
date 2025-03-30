@@ -1,10 +1,14 @@
 // components/consumption/ConsumptionList.tsx
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-
 import { ACTIVITY_TYPES } from '@/utils/constants';
-import { Consumption } from '@/utils/types';
+import { Consumption, ConsumptionPatchPayload } from '@/utils/types';
 import { useUser } from '@/contexts/UserContext';
+import {
+  findConsumptionById,
+  getChangedConsumptionFields,
+  hasChanges,
+} from '@/utils/utils';
 
 export default function ConsumptionList() {
   const navigate = useNavigate();
@@ -12,6 +16,9 @@ export default function ConsumptionList() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const { userContext } = useUser();
+  // Editing States
+  const [editingId, setEditingId] = useState<number | null>(null);
+  const [editFormData, setEditFormData] = useState<Consumption | null>(null);
 
   useEffect(() => {
     const fetchConsumptions = async () => {
@@ -99,6 +106,124 @@ export default function ConsumptionList() {
     }, 0);
   };
 
+  const handleEdit = (consumption: Consumption) => {
+    setEditingId(consumption.id);
+    setEditFormData({ ...consumption });
+  };
+  const handleSaveEdit = async () => {
+    if (!editFormData) return;
+
+    try {
+      const originalConsumption = findConsumptionById(consumptions, editingId);
+      if (!originalConsumption) return;
+
+      const changedFields: ConsumptionPatchPayload =
+        getChangedConsumptionFields(editFormData, originalConsumption);
+
+      if (!hasChanges(changedFields)) {
+        setEditingId(null);
+        setEditFormData(null);
+        return;
+      }
+
+      if (changedFields.activity_type_id) {
+        const newActivityType = ACTIVITY_TYPES.find(
+          (type) => type.id === editFormData.activity_type_id
+        );
+        if (newActivityType) {
+          changedFields.activity_type_name = newActivityType.name;
+          changedFields.unit = newActivityType.unit;
+          changedFields.emission_factor = newActivityType.co2;
+        }
+      }
+
+      const response = await fetch(
+        `http://localhost:3000/consumption/patch/${editingId}`,
+        {
+          method: 'PATCH',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(changedFields),
+          credentials: 'include',
+        }
+      );
+
+      console.log('Response status:', response.status);
+
+      let responseData: { data: Consumption } | undefined;
+      try {
+        responseData = await response.json();
+        console.log('Response data:', responseData);
+      } catch (e) {
+        const responseText = await response.text();
+        console.log('Response is not JSON. Raw text:', responseText, e);
+
+        if (!response.ok) {
+          throw new Error(`Error: ${response.status} - ${responseText}`);
+        }
+      }
+
+      if (!response.ok) {
+        throw new Error(
+          `Error: ${response.status} - ${JSON.stringify(responseData)}`
+        );
+      }
+      setConsumptions(
+        consumptions.map((c) =>
+          c.id === editingId && responseData?.data ? responseData.data : c
+        )
+      );
+
+      setEditingId(null);
+      setEditFormData(null);
+    } catch (err) {
+      console.error('Failed to update consumption', err);
+      alert('Failed to update consumption');
+    }
+  };
+
+  const handleCancelEdit = () => {
+    setEditingId(null);
+    setEditFormData(null);
+  };
+
+  const handleEditChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+  ) => {
+    const { name, value } = e.target;
+
+    if (editFormData) {
+      const updatedData = {
+        ...editFormData,
+        [name]:
+          name === 'amount'
+            ? parseFloat(value)
+            : name === 'activity_type_id'
+            ? parseInt(value)
+            : value,
+      };
+
+      if (name === 'amount' || name === 'activity_type_id') {
+        const activityType = ACTIVITY_TYPES.find(
+          (type) =>
+            type.id ===
+            (name === 'activity_type_id'
+              ? parseInt(value)
+              : updatedData.activity_type_id)
+        );
+
+        if (activityType) {
+          updatedData.co2_equivalent = updatedData.amount * activityType.co2;
+
+          if (name === 'activity_type_id') {
+            updatedData.unit_name = activityType.unit;
+          }
+        }
+      }
+
+      setEditFormData(updatedData);
+    }
+  };
+
   if (isLoading) {
     return (
       <div className="flex justify-center items-center h-64">
@@ -166,13 +291,55 @@ export default function ConsumptionList() {
                 {consumptions.map((consumption) => (
                   <tr key={consumption.id} className="hover:bg-gray-50">
                     <td className="py-3 px-4 border-b">
-                      {getActivityName(consumption.activity_type_id)}
+                      {editingId === consumption.id ? (
+                        <select
+                          name="activity_type_id"
+                          value={editFormData?.activity_type_id || ''}
+                          onChange={(e) =>
+                            handleEditChange({
+                              target: {
+                                name: 'activity_type_id',
+                                value: parseInt(e.target.value),
+                              },
+                            } as unknown as React.ChangeEvent<HTMLInputElement>)
+                          }
+                          className="p-1 border rounded w-full"
+                        >
+                          {ACTIVITY_TYPES.map((type) => (
+                            <option key={type.id} value={type.id}>
+                              {type.name}
+                            </option>
+                          ))}
+                        </select>
+                      ) : (
+                        getActivityName(consumption.activity_type_id)
+                      )}
                     </td>
                     <td className="py-3 px-4 border-b">
-                      {consumption.amount} {consumption.unit_name}
+                      {editingId === consumption.id ? (
+                        <input
+                          type="number"
+                          name="amount"
+                          value={editFormData?.amount || ''}
+                          onChange={handleEditChange}
+                          className="w-16 p-1 border rounded"
+                        />
+                      ) : (
+                        `${consumption.amount} ${consumption.unit_name}`
+                      )}
                     </td>
                     <td className="py-3 px-4 border-b">
-                      {formatDate(consumption.date)}
+                      {editingId === consumption.id ? (
+                        <input
+                          type="date"
+                          name="date"
+                          value={editFormData?.date.split('T')[0] || ''}
+                          onChange={handleEditChange}
+                          className="p-1 border rounded"
+                        />
+                      ) : (
+                        formatDate(consumption.date)
+                      )}
                     </td>
                     <td className="py-3 px-4 border-b">
                       <span className="font-medium">
@@ -182,12 +349,37 @@ export default function ConsumptionList() {
                     </td>
                     <td className="py-3 px-4 border-b">
                       <div className="flex space-x-2">
-                        <button
-                          onClick={() => handleDelete(consumption.id)}
-                          className="text-red-500 hover:text-red-700"
-                        >
-                          Delete
-                        </button>
+                        {editingId === consumption.id ? (
+                          <>
+                            <button
+                              onClick={handleSaveEdit}
+                              className="text-green-500 hover:text-green-700"
+                            >
+                              Save
+                            </button>
+                            <button
+                              onClick={handleCancelEdit}
+                              className="text-gray-500 hover:text-gray-700"
+                            >
+                              Cancel
+                            </button>
+                          </>
+                        ) : (
+                          <>
+                            <button
+                              onClick={() => handleDelete(consumption.id)}
+                              className="text-red-500 hover:text-red-700"
+                            >
+                              Delete
+                            </button>
+                            <button
+                              onClick={() => handleEdit(consumption)}
+                              className="text-blue-500 hover:text-blue-700"
+                            >
+                              Edit
+                            </button>
+                          </>
+                        )}
                       </div>
                     </td>
                   </tr>
