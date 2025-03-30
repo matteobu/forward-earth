@@ -23,6 +23,9 @@ export default function ConsumptionList() {
     {}
   );
   const [isSubmitting, setIsSubmitting] = useState(false);
+  // Sorting
+  const [sortField, setSortField] = useState<string | null>(null);
+  const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
 
   useEffect(() => {
     const fetchConsumptions = async () => {
@@ -242,6 +245,40 @@ export default function ConsumptionList() {
     }
   };
 
+  const handleSort = (field: string) => {
+    if (sortField === field) {
+      setSortDirection(sortDirection === 'asc' ? 'desc' : 'asc');
+    } else {
+      setSortField(field);
+      setSortDirection('asc');
+    }
+
+    fetchSortedData(field, sortDirection);
+  };
+
+  const fetchSortedData = async (field: string, direction: 'asc' | 'desc') => {
+    setIsLoading(true);
+    try {
+      console.log('received sorting info:', field, direction);
+    } catch (err) {
+      console.error('Error fetching sorted data:', err);
+      setError(err instanceof Error ? err.message : 'Unknown error occurred');
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  const renderSortIndicator = (field: string) => {
+    if (sortField !== field) {
+      return <span className="text-gray-300 ml-1">↕</span>;
+    }
+    return sortDirection === 'asc' ? (
+      <span className="text-blue-500 ml-1">↑</span>
+    ) : (
+      <span className="text-blue-500 ml-1">↓</span>
+    );
+  };
+
   if (isLoading) {
     return (
       <div className="flex justify-center items-center h-64">
@@ -298,15 +335,29 @@ export default function ConsumptionList() {
             <table className="min-w-full bg-white border border-gray-200 rounded-md">
               <thead className="bg-gray-50">
                 <tr>
-                  <th className="py-3 px-4 text-left border-b w-[25%]">
-                    Activity
+                  <th
+                    className="py-3 px-4 text-left border-b w-[25%] cursor-pointer hover:bg-gray-100"
+                    onClick={() => handleSort('activity_table.name')}
+                  >
+                    Activity {renderSortIndicator('activity_table.name')}
                   </th>
-                  <th className="py-3 px-4 text-left border-b w-[15%]">
-                    Amount
+                  <th
+                    className="py-3 px-4 text-left border-b w-[15%] cursor-pointer hover:bg-gray-100"
+                    onClick={() => handleSort('amount')}
+                  >
+                    Amount {renderSortIndicator('amount')}
                   </th>
-                  <th className="py-3 px-4 text-left border-b w-[15%]">Date</th>
-                  <th className="py-3 px-4 text-left border-b w-[20%]">
-                    CO2 Impact
+                  <th
+                    className="py-3 px-4 text-left border-b w-[15%] cursor-pointer hover:bg-gray-100"
+                    onClick={() => handleSort('date')}
+                  >
+                    Date {renderSortIndicator('date')}
+                  </th>
+                  <th
+                    className="py-3 px-4 text-left border-b w-[20%] cursor-pointer hover:bg-gray-100"
+                    onClick={() => handleSort('co2_equivalent')}
+                  >
+                    CO2 Impact {renderSortIndicator('co2_equivalent')}
                   </th>
                   <th className="py-3 px-4 text-left border-b w-[25%]">
                     Actions

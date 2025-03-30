@@ -33,4 +33,18 @@ export class ConsumptionService {
   async getUserConsumption(user_id: number) {
     return this.supabaseService.getUserConsumption(user_id);
   }
+
+  async getUserConsumptionPaginated(params: {
+    user_id: number;
+    page: number;
+    limit: number;
+    sortBy: string;
+    sortOrder: 'ASC' | 'DESC';
+    dateFrom?: string;
+    dateTo?: string;
+    activityType?: number;
+  }) {
+    await Promise.resolve();
+    console.log(params);
+  }
 }
