@@ -3,6 +3,10 @@ import { createClient } from '@supabase/supabase-js';
 import { User } from 'src/users/entities/user.entity';
 import * as dotenv from 'dotenv';
 import { Consumption } from 'src/consumption/entities/consumption.entity';
+import {
+  CreateConsumptionDto,
+  PatchConsumptionDto,
+} from 'src/consumption/dto/create-consumption.dto';
 
 dotenv.config();
 
@@ -11,7 +15,6 @@ export class SupabaseService {
   private supabase;
 
   constructor() {
-    // Initialize Supabase client
     this.supabase = createClient(
       process.env.SUPABASE_URL || '',
       process.env.SUPABASE_KEY || '',
@@ -128,16 +131,7 @@ export class SupabaseService {
     return enrichedConsumptions;
   }
 
-  async createConsumption(consumptionData: {
-    user_id: number;
-    amount: number;
-    activity_type_id: number;
-    activity_name: string;
-    emission_factor: number;
-    date: string;
-    co2_equivalent: number;
-    unit: string;
-  }) {
+  async createConsumption(consumptionData: CreateConsumptionDto) {
     const { data: unitData, error: unitError } = await this.supabase
       .from('UnitTable')
       .insert([{ name: consumptionData.unit }])
@@ -210,8 +204,6 @@ export class SupabaseService {
   }
 
   async deleteUserConsumption(consumption_id: number) {
-    console.log('Deleting consumption with ID:', consumption_id);
-
     const { data: consumptionData, error: fetchError } = await this.supabase
       .from('ConsumptionTable')
       .select('id, unit_id, activity_type_id')
@@ -232,7 +224,6 @@ export class SupabaseService {
     const { unit_id, activity_type_id } = consumptionData;
 
     try {
-      // 2. Elimina il record dalla ConsumptionTable
       const { error: consumptionError } = await this.supabase
         .from('ConsumptionTable')
         .delete()
@@ -244,7 +235,6 @@ export class SupabaseService {
         );
       }
 
-      // 3. Verifica se ci sono altre consumazioni che usano la stessa unità
       const { data: otherConsumptionsWithUnit, error: unitCheckError } =
         await this.supabase
           .from('ConsumptionTable')
@@ -257,7 +247,6 @@ export class SupabaseService {
         );
       }
 
-      // 4. Se nessun'altra consumazione usa questa unità, eliminala
       if (
         !otherConsumptionsWithUnit ||
         otherConsumptionsWithUnit.length === 0
@@ -304,6 +293,102 @@ export class SupabaseService {
       return { success: true, id: consumption_id };
     } catch (error) {
       console.error('Error in deletion process:', error);
+      throw error;
+    }
+  }
+
+  async updateUserConsumption(
+    id: number,
+    patchConsumptionDto: PatchConsumptionDto,
+  ) {
+    console.log('Updating consumption with ID:', id);
+    console.log('Patch data:', patchConsumptionDto);
+    try {
+      const { data: currentConsumption, error: fetchError } =
+        await this.supabase
+          .from('ConsumptionTable')
+          .select(
+            '*, UnitTable(id, name), ActivityTypeTable(id, name, emission_factor)',
+          )
+          .eq('id', id)
+          .single();
+
+      if (fetchError) {
+        throw new Error(
+          `Error fetching current consumption: ${fetchError.message}`,
+        );
+      }
+      console.log({ currentConsumption });
+
+      if (patchConsumptionDto.activity_type_id) {
+        const { error: updateActivityError } = await this.supabase
+          .from('ActivityTypeTable')
+          .update({
+            id: patchConsumptionDto.activity_type_id,
+            name: patchConsumptionDto.activity_type_name,
+            emission_factor: patchConsumptionDto.emission_factor,
+          })
+          .eq('id', currentConsumption.ActivityTypeTable.id);
+
+        if (updateActivityError) {
+          throw new Error(
+            `Error updating activity type: ${updateActivityError.message}`,
+          );
+        }
+      }
+
+      if (patchConsumptionDto.unit) {
+        const { error: updateUnitError } = await this.supabase
+          .from('UnitTable')
+          .update({
+            name: patchConsumptionDto.unit,
+          })
+          .eq('id', currentConsumption.unit_id);
+
+        if (updateUnitError) {
+          throw new Error(`Error updating unit: ${updateUnitError.message}`);
+        }
+      }
+
+      const updateData: any = {};
+
+      if (patchConsumptionDto.amount !== undefined) {
+        updateData.amount = patchConsumptionDto.amount;
+      }
+
+      if (patchConsumptionDto.activity_type_id !== undefined) {
+        updateData.activity_type_id = patchConsumptionDto.activity_type_id;
+      }
+
+      if (patchConsumptionDto.unit_id !== undefined) {
+        updateData.unit_id = patchConsumptionDto.unit_id;
+      }
+
+      if (patchConsumptionDto.co2_equivalent !== undefined) {
+        updateData.co2_equivalent = patchConsumptionDto.co2_equivalent;
+      }
+
+      if (patchConsumptionDto.date !== undefined) {
+        updateData.date = patchConsumptionDto.date;
+      }
+
+      if (Object.keys(updateData).length > 0) {
+        const { data, error } = await this.supabase
+          .from('ConsumptionTable')
+          .update(updateData)
+          .eq('id', id)
+          .select();
+
+        if (error) {
+          throw new Error(`Error updating consumption: ${error.message}`);
+        }
+
+        return data[0] as Consumption;
+      }
+
+      return currentConsumption as Consumption;
+    } catch (error) {
+      console.error('Error in updateUserConsumption:', error);
       throw error;
     }
   }
