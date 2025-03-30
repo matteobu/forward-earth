@@ -1,5 +1,8 @@
 import { Injectable } from '@nestjs/common';
-import { CreateConsumptionDto } from './dto/create-consumption.dto';
+import {
+  CreateConsumptionDto,
+  PatchConsumptionDto,
+} from './dto/create-consumption.dto';
 import { SupabaseService } from 'src/supabase/supabase.service';
 
 @Injectable()
@@ -19,16 +22,8 @@ export class ConsumptionService {
     });
   }
 
-  findAll() {
-    return `This action returns all consumption`;
-  }
-
-  findOne(id: number) {
-    return `This action returns a #${id} consumption`;
-  }
-
-  update(id: number) {
-    return `This action updates a #${id} consumption`;
+  async patch(id: number, patchConsumptionDto: PatchConsumptionDto) {
+    return this.supabaseService.updateUserConsumption(id, patchConsumptionDto);
   }
 
   remove(id: number) {
