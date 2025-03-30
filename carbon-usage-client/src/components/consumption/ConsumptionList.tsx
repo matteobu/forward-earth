@@ -59,11 +59,6 @@ export default function ConsumptionList() {
     return activity ? activity.name : 'Unknown Activity';
   };
 
-  const getUnit = (activityTypeId: number) => {
-    const activity = ACTIVITY_TYPES.find((type) => type.id === activityTypeId);
-    return activity ? activity.unit : '';
-  };
-
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
     return date.toLocaleDateString('en-US', {
@@ -91,7 +86,6 @@ export default function ConsumptionList() {
         throw new Error(`Error: ${response.status}`);
       }
 
-      // Remove the deleted consumption from state
       setConsumptions((prev) => prev.filter((c) => c.id !== id));
     } catch (err) {
       console.error('Failed to delete consumption', err);
@@ -175,8 +169,7 @@ export default function ConsumptionList() {
                       {getActivityName(consumption.activity_type_id)}
                     </td>
                     <td className="py-3 px-4 border-b">
-                      {consumption.amount}{' '}
-                      {getUnit(consumption.activity_type_id)}
+                      {consumption.amount} {consumption.unit_name}
                     </td>
                     <td className="py-3 px-4 border-b">
                       {formatDate(consumption.date)}

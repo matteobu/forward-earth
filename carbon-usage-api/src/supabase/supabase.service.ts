@@ -52,15 +52,80 @@ export class SupabaseService {
   // CONSUMPTION ROUTE
   // ***
   async getUserConsumption(user_id: number) {
-    const { data, error } = await this.supabase
-      .from('ConsumptionTable')
-      .select('*')
-      .eq('user_id', user_id);
+    const { data: consumptionData, error: consumptionError } =
+      await this.supabase
+        .from('ConsumptionTable')
+        .select('*')
+        .eq('user_id', user_id);
 
-    if (error) {
-      throw new Error('Error fetching user from Supabase');
+    if (consumptionError) {
+      console.error('Error fetching consumptions:', consumptionError);
+      throw new Error(
+        `Error fetching consumptions: ${consumptionError.message}`,
+      );
     }
-    return data as Consumption[];
+
+    if (!consumptionData || consumptionData.length === 0) {
+      return [];
+    }
+
+    const activityTypeIds = consumptionData.map(
+      (consumption: Consumption) => consumption.activity_type_id,
+    );
+
+    const unitIds = consumptionData.map(
+      (consumption: Consumption) => consumption.unit_id,
+    );
+
+    const { data: activityTypeData, error: activityTypeError } =
+      await this.supabase
+        .from('ActivityTypeTable')
+        .select('id, activity_type_id')
+        .in('id', activityTypeIds);
+
+    if (activityTypeError) {
+      console.error('Error fetching activity types:', activityTypeError);
+      throw new Error(
+        `Error fetching activity types: ${activityTypeError.message}`,
+      );
+    }
+
+    const { data: unitData, error: unitError } = await this.supabase
+      .from('UnitTable')
+      .select('id, name')
+      .in('id', unitIds);
+
+    if (unitError) {
+      console.error('Error fetching units:', unitError);
+      throw new Error(`Error fetching units: ${unitError.message}`);
+    }
+
+    const activityTypeMap = new Map();
+    activityTypeData?.forEach((type) => {
+      activityTypeMap.set(type.id, type.activity_type_id);
+    });
+
+    const unitMap = new Map();
+    unitData?.forEach((unit) => {
+      unitMap.set(unit.id, unit.name);
+    });
+
+    const enrichedConsumptions: Consumption[] = consumptionData.map(
+      (consumption: Consumption) => {
+        const mappedActivityTypeId = activityTypeMap.get(
+          consumption.activity_type_id,
+        );
+        const unitName = unitMap.get(consumption.unit_id);
+        return {
+          ...consumption,
+          activity_type_id:
+            mappedActivityTypeId || consumption.activity_type_id,
+          unit_name: unitName || '',
+        };
+      },
+    );
+
+    return enrichedConsumptions;
   }
 
   async createConsumption(consumptionData: {

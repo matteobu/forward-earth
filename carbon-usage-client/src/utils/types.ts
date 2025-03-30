@@ -14,4 +14,5 @@ export type Consumption = {
   co2_equivalent: number;
   date: string;
   created_at: string;
+  unit_name: string;
 };
