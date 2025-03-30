@@ -32,7 +32,7 @@ export class ConsumptionService {
   }
 
   remove(id: number) {
-    return `This action removes a #${id} consumption`;
+    return this.supabaseService.deleteUserConsumption(id);
   }
 
   async getUserConsumption(user_id: number) {

@@ -18,7 +18,7 @@ export class ConsumptionController {
 
   @Get(':id')
   async getConsumptionInfo(@Param('id') user_id: number) {
-    const consumption: Consumption =
+    const consumption: Consumption[] =
       await this.consumptionService.getUserConsumption(user_id);
     return consumption;
   }
@@ -53,8 +53,9 @@ export class ConsumptionController {
     return this.consumptionService.findOne(+id);
   }
 
-  @Delete(':id')
+  @Delete('delete/:id')
   remove(@Param('id') id: string) {
+    console.log('REQUEST RECEIVED WITH ID:', id);
     return this.consumptionService.remove(+id);
   }
 }

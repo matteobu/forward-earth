@@ -60,7 +60,7 @@ export class SupabaseService {
     if (error) {
       throw new Error('Error fetching user from Supabase');
     }
-    return data as Consumption;
+    return data as Consumption[];
   }
 
   async createConsumption(consumptionData: {
@@ -142,5 +142,104 @@ export class SupabaseService {
       date: string;
       created_at: string;
     };
+  }
+
+  async deleteUserConsumption(consumption_id: number) {
+    console.log('Deleting consumption with ID:', consumption_id);
+
+    const { data: consumptionData, error: fetchError } = await this.supabase
+      .from('ConsumptionTable')
+      .select('id, unit_id, activity_type_id')
+      .eq('id', consumption_id)
+      .single();
+
+    if (fetchError) {
+      console.error('Error fetching consumption details:', fetchError);
+      throw new Error(
+        `Error fetching consumption details: ${fetchError.message}`,
+      );
+    }
+
+    if (!consumptionData) {
+      throw new Error(`Consumption with ID ${consumption_id} not found`);
+    }
+
+    const { unit_id, activity_type_id } = consumptionData;
+
+    try {
+      // 2. Elimina il record dalla ConsumptionTable
+      const { error: consumptionError } = await this.supabase
+        .from('ConsumptionTable')
+        .delete()
+        .eq('id', consumption_id);
+
+      if (consumptionError) {
+        throw new Error(
+          `Error deleting consumption: ${consumptionError.message}`,
+        );
+      }
+
+      // 3. Verifica se ci sono altre consumazioni che usano la stessa unità
+      const { data: otherConsumptionsWithUnit, error: unitCheckError } =
+        await this.supabase
+          .from('ConsumptionTable')
+          .select('id')
+          .eq('unit_id', unit_id);
+
+      if (unitCheckError) {
+        throw new Error(
+          `Error checking unit references: ${unitCheckError.message}`,
+        );
+      }
+
+      // 4. Se nessun'altra consumazione usa questa unità, eliminala
+      if (
+        !otherConsumptionsWithUnit ||
+        otherConsumptionsWithUnit.length === 0
+      ) {
+        const { error: unitError } = await this.supabase
+          .from('UnitTable')
+          .delete()
+          .eq('id', unit_id);
+
+        if (unitError) {
+          console.warn(`Could not delete unit: ${unitError.message}`);
+        }
+      }
+
+      const { data: otherConsumptionsWithActivity, error: activityCheckError } =
+        await this.supabase
+          .from('ConsumptionTable')
+          .select('id')
+          .eq('activity_type_id', activity_type_id);
+
+      if (activityCheckError) {
+        throw new Error(
+          `Error checking activity type references: ${activityCheckError.message}`,
+        );
+      }
+
+      if (
+        !otherConsumptionsWithActivity ||
+        otherConsumptionsWithActivity.length === 0
+      ) {
+        const { error: activityError } = await this.supabase
+          .from('ActivityTypeTable')
+          .delete()
+          .eq('id', activity_type_id);
+
+        if (activityError) {
+          console.warn(
+            `Could not delete activity type: ${activityError.message}`,
+          );
+        }
+      }
+
+      console.log('Successfully deleted consumption and related data');
+      return { success: true, id: consumption_id };
+    } catch (error) {
+      console.error('Error in deletion process:', error);
+      throw error;
+    }
   }
 }

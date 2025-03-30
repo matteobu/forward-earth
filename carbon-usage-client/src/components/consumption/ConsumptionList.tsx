@@ -35,7 +35,7 @@ export default function ConsumptionList() {
         }
 
         const responseJson = await consumptionsResponse.json();
-
+        console.log(responseJson);
         const consumptionsData = Array.isArray(responseJson.data)
           ? responseJson.data
           : Array.isArray(responseJson)
@@ -59,9 +59,9 @@ export default function ConsumptionList() {
     return activity ? activity.name : 'Unknown Activity';
   };
 
-  const getUnitName = (unitId: number) => {
-    // Se hai un modo per ottenere il nome dell'unità, implementalo qui
-    return unitId ? `Unit ${unitId}` : '';
+  const getUnit = (activityTypeId: number) => {
+    const activity = ACTIVITY_TYPES.find((type) => type.id === activityTypeId);
+    return activity ? activity.unit : '';
   };
 
   const formatDate = (dateString: string) => {
@@ -175,7 +175,8 @@ export default function ConsumptionList() {
                       {getActivityName(consumption.activity_type_id)}
                     </td>
                     <td className="py-3 px-4 border-b">
-                      {consumption.amount} {getUnitName(consumption.unit_id)}
+                      {consumption.amount}{' '}
+                      {getUnit(consumption.activity_type_id)}
                     </td>
                     <td className="py-3 px-4 border-b">
                       {formatDate(consumption.date)}
