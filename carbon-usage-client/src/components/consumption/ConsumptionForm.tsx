@@ -11,7 +11,7 @@ export default function ConsumptionForm() {
   const { userContext } = useUser();
   const [formData, setFormData] = useState({
     amount: '',
-    activityTypeId: '',
+    activity_type_id: '',
     date: new Date().toISOString().split('T')[0],
   });
   const [selectedActivity, setSelectedActivity] = useState<ActivityType | null>(
@@ -20,9 +20,9 @@ export default function ConsumptionForm() {
   const [co2Impact, setCo2Impact] = useState<number | null>(null);
 
   useEffect(() => {
-    if (formData.activityTypeId) {
+    if (formData.activity_type_id) {
       const activity = ACTIVITY_TYPES.find(
-        (type) => type.id.toString() === formData.activityTypeId
+        (type) => type.activity_type_id.toString() === formData.activity_type_id
       );
       setSelectedActivity(activity || null);
     } else {
@@ -30,7 +30,7 @@ export default function ConsumptionForm() {
     }
 
     updateCo2Impact(formData.amount, selectedActivity);
-  }, [formData.activityTypeId]);
+  }, [formData.activity_type_id]);
 
   useEffect(() => {
     updateCo2Impact(formData.amount, selectedActivity);
@@ -40,7 +40,7 @@ export default function ConsumptionForm() {
     if (amount && activity) {
       const numAmount = parseFloat(amount);
       if (!isNaN(numAmount)) {
-        setCo2Impact(numAmount * activity.co2);
+        setCo2Impact(numAmount * activity.emission_factor);
       } else {
         setCo2Impact(null);
       }
@@ -72,12 +72,14 @@ export default function ConsumptionForm() {
         body: JSON.stringify({
           user_id: userContext.userId,
           amount: parseFloat(submissionData.amount),
-          activity_type_id: parseInt(submissionData.activityTypeId),
+          activity_type_id: parseInt(submissionData.activity_type_id),
           date: submissionData.date,
           co2_equivalent: submissionData.co2_equivalent,
           unit: submissionData.unit,
           activity_name: selectedActivity ? selectedActivity.name : '',
-          emission_factor: selectedActivity ? selectedActivity.co2 : 0,
+          emission_factor: selectedActivity
+            ? selectedActivity.emission_factor
+            : 0,
         }),
         credentials: 'include',
       });
@@ -85,10 +87,11 @@ export default function ConsumptionForm() {
       if (!response.ok) {
         throw new Error(`Error: ${response.status}`);
       }
+      const responseData = await response.json();
+      console.log(responseData);
     } catch (error) {
       console.error('Failed to create consumption', error);
     }
-
     navigate('/dashboard/consumptions/list');
   };
 
@@ -103,15 +106,15 @@ export default function ConsumptionForm() {
         <div className="mb-4">
           <label className="block text-gray-700 mb-2">Activity Type</label>
           <select
-            name="activityTypeId"
-            value={formData.activityTypeId}
+            name="activity_type_id"
+            value={formData.activity_type_id}
             onChange={handleChange}
             className="w-full p-2 border rounded"
             required
           >
             <option value="">Select type...</option>
             {ACTIVITY_TYPES.map((type) => (
-              <option key={type.id} value={type.id}>
+              <option key={type.activity_type_id} value={type.activity_type_id}>
                 {type.name}
               </option>
             ))}
@@ -160,7 +163,7 @@ export default function ConsumptionForm() {
             </p>
             <p className="text-sm text-gray-500 mt-1">
               Calculation: {formData.amount} {selectedActivity?.unit} ×{' '}
-              {selectedActivity?.co2} kg CO<sub>2</sub>e per{' '}
+              {selectedActivity?.emission_factor} kg CO<sub>2</sub>e per{' '}
               {selectedActivity?.unit}
             </p>
           </div>

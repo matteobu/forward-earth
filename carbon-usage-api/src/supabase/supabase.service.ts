@@ -73,7 +73,7 @@ export class SupabaseService {
     }
 
     const activityTypeIds = consumptionData.map(
-      (consumption: Consumption) => consumption.activity_type_id,
+      (consumption: Consumption) => consumption.activity_type_table_id,
     );
 
     const unitIds = consumptionData.map(
@@ -83,7 +83,7 @@ export class SupabaseService {
     const { data: activityTypeData, error: activityTypeError } =
       await this.supabase
         .from('ActivityTypeTable')
-        .select('id, activity_type_id')
+        .select('id, name, emission_factor, activity_type_id')
         .in('id', activityTypeIds);
 
     if (activityTypeError) {
@@ -105,25 +105,41 @@ export class SupabaseService {
 
     const activityTypeMap = new Map();
     activityTypeData?.forEach((type) => {
-      activityTypeMap.set(type.id, type.activity_type_id);
+      activityTypeMap.set(type.id, type);
     });
 
     const unitMap = new Map();
     unitData?.forEach((unit) => {
-      unitMap.set(unit.id, unit.name);
+      unitMap.set(unit.id, unit);
     });
 
     const enrichedConsumptions: Consumption[] = consumptionData.map(
-      (consumption: Consumption) => {
-        const mappedActivityTypeId = activityTypeMap.get(
-          consumption.activity_type_id,
+      (consumption: any) => {
+        const activityType = activityTypeMap.get(
+          consumption.activity_type_table_id,
         );
-        const unitName = unitMap.get(consumption.unit_id);
+        const unit = unitMap.get(consumption.unit_id);
+
         return {
-          ...consumption,
-          activity_type_id:
-            mappedActivityTypeId || consumption.activity_type_id,
-          unit_name: unitName || '',
+          id: consumption.id,
+          user_id: consumption.user_id,
+          amount: consumption.amount,
+          activity_type_table_id: consumption.activity_type_table_id,
+          unit_id: consumption.unit_id,
+          co2_equivalent: consumption.co2_equivalent,
+          date: consumption.date,
+          created_at: consumption.created_at,
+          deleted_at: consumption.deleted_at,
+          unit_table: {
+            id: unit?.id,
+            name: unit?.name,
+          },
+          activity_table: {
+            id: activityType?.id,
+            name: activityType?.name,
+            emission_factor: activityType?.emission_factor,
+            activity_type_id: activityType?.activity_type_id,
+          },
         };
       },
     );
@@ -143,9 +159,7 @@ export class SupabaseService {
     }
 
     const unitId = unitData.id;
-
-    let activityTypeId = consumptionData.activity_type_id;
-
+    let activityTypeTableId = 0;
     if (consumptionData.activity_name && consumptionData.emission_factor) {
       const { data: activityTypeData, error: activityTypeError } =
         await this.supabase
@@ -166,10 +180,7 @@ export class SupabaseService {
           `Error creating activity type: ${activityTypeError.message}`,
         );
       }
-
-      if (activityTypeData) {
-        activityTypeId = activityTypeData.id;
-      }
+      activityTypeTableId = activityTypeData.id;
     }
 
     const { data, error } = await this.supabase
@@ -178,7 +189,7 @@ export class SupabaseService {
         {
           user_id: consumptionData.user_id,
           amount: consumptionData.amount,
-          activity_type_id: activityTypeId,
+          activity_type_table_id: activityTypeTableId,
           unit_id: unitId,
           co2_equivalent: consumptionData.co2_equivalent,
           date: consumptionData.date,
@@ -195,10 +206,11 @@ export class SupabaseService {
       id: number;
       user_id: number;
       amount: number;
-      activity_type_id: number;
+      activity_type_table_id: number;
       unit_id: number;
       co2_equivalent: number;
       date: string;
+      unit_name: string;
       created_at: string;
     };
   }
@@ -320,49 +332,60 @@ export class SupabaseService {
       }
       console.log({ currentConsumption });
 
-      if (patchConsumptionDto.activity_type_id) {
-        const { error: updateActivityError } = await this.supabase
-          .from('ActivityTypeTable')
-          .update({
-            id: patchConsumptionDto.activity_type_id,
-            name: patchConsumptionDto.activity_type_name,
-            emission_factor: patchConsumptionDto.emission_factor,
-          })
-          .eq('id', currentConsumption.ActivityTypeTable.id);
+      // 1. Aggiorna ActivityTypeTable se necessario
+      if (
+        patchConsumptionDto.activity_type_name ||
+        patchConsumptionDto.emission_factor
+      ) {
+        const updateFields: any = {};
 
-        if (updateActivityError) {
-          throw new Error(
-            `Error updating activity type: ${updateActivityError.message}`,
-          );
+        if (patchConsumptionDto.activity_type_name) {
+          updateFields.name = patchConsumptionDto.activity_type_name;
+        }
+
+        if (patchConsumptionDto.emission_factor) {
+          updateFields.emission_factor = patchConsumptionDto.emission_factor;
+        }
+
+        if (Object.keys(updateFields).length > 0) {
+          // Aggiorna l'ActivityType esistente (non cambiamo l'ID)
+          const { error: updateError } = await this.supabase
+            .from('ActivityTypeTable')
+            .update(updateFields)
+            .eq('id', currentConsumption.activity_type_id);
+
+          if (updateError) {
+            throw new Error(
+              `Error updating activity type: ${updateError.message}`,
+            );
+          }
         }
       }
 
-      if (patchConsumptionDto.unit) {
-        const { error: updateUnitError } = await this.supabase
+      // 2. Aggiorna UnitTable se necessario
+      if (
+        patchConsumptionDto.unit &&
+        patchConsumptionDto.unit !== currentConsumption.UnitTable.name
+      ) {
+        const { error: updateError } = await this.supabase
           .from('UnitTable')
-          .update({
-            name: patchConsumptionDto.unit,
-          })
-          .eq('id', currentConsumption.unit_id);
+          .update({ name: patchConsumptionDto.unit })
+          .eq('id', currentConsumption.UnitTable.id);
 
-        if (updateUnitError) {
-          throw new Error(`Error updating unit: ${updateUnitError.message}`);
+        if (updateError) {
+          throw new Error(`Error updating unit: ${updateError.message}`);
         }
       }
 
+      // 3. Aggiorna ConsumptionTable
       const updateData: any = {};
 
       if (patchConsumptionDto.amount !== undefined) {
         updateData.amount = patchConsumptionDto.amount;
       }
 
-      if (patchConsumptionDto.activity_type_id !== undefined) {
-        updateData.activity_type_id = patchConsumptionDto.activity_type_id;
-      }
-
-      if (patchConsumptionDto.unit_id !== undefined) {
-        updateData.unit_id = patchConsumptionDto.unit_id;
-      }
+      // Non aggiorniamo activity_type_id perché gli ID non cambiano
+      // Non aggiorniamo unit_id perché gli ID non cambiano
 
       if (patchConsumptionDto.co2_equivalent !== undefined) {
         updateData.co2_equivalent = patchConsumptionDto.co2_equivalent;
@@ -372,6 +395,7 @@ export class SupabaseService {
         updateData.date = patchConsumptionDto.date;
       }
 
+      console.log('ConsumptionTable update data:', updateData);
       if (Object.keys(updateData).length > 0) {
         const { data, error } = await this.supabase
           .from('ConsumptionTable')
