@@ -87,8 +87,6 @@ export default function ConsumptionForm() {
       if (!response.ok) {
         throw new Error(`Error: ${response.status}`);
       }
-      const responseData = await response.json();
-      console.log(responseData);
     } catch (error) {
       console.error('Failed to create consumption', error);
     }

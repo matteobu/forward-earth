@@ -218,7 +218,7 @@ export class SupabaseService {
   async deleteUserConsumption(consumption_id: number) {
     const { data: consumptionData, error: fetchError } = await this.supabase
       .from('ConsumptionTable')
-      .select('id, unit_id, activity_type_id')
+      .select('id, unit_id, activity_type_table_id')
       .eq('id', consumption_id)
       .single();
 
@@ -233,7 +233,7 @@ export class SupabaseService {
       throw new Error(`Consumption with ID ${consumption_id} not found`);
     }
 
-    const { unit_id, activity_type_id } = consumptionData;
+    const { unit_id, activity_type_table_id } = consumptionData;
 
     try {
       const { error: consumptionError } = await this.supabase
@@ -247,61 +247,26 @@ export class SupabaseService {
         );
       }
 
-      const { data: otherConsumptionsWithUnit, error: unitCheckError } =
-        await this.supabase
-          .from('ConsumptionTable')
-          .select('id')
-          .eq('unit_id', unit_id);
+      const { error: activityTypeTableError } = await this.supabase
+        .from('ActivityTypeTable')
+        .delete()
+        .eq('id', activity_type_table_id);
 
-      if (unitCheckError) {
+      if (activityTypeTableError) {
         throw new Error(
-          `Error checking unit references: ${unitCheckError.message}`,
+          `Error deleting Activity Table: ${activityTypeTableError.message}`,
         );
       }
 
-      if (
-        !otherConsumptionsWithUnit ||
-        otherConsumptionsWithUnit.length === 0
-      ) {
-        const { error: unitError } = await this.supabase
-          .from('UnitTable')
-          .delete()
-          .eq('id', unit_id);
+      const { error: unitTable } = await this.supabase
+        .from('UnitTable')
+        .delete()
+        .eq('id', unit_id);
 
-        if (unitError) {
-          console.warn(`Could not delete unit: ${unitError.message}`);
-        }
+      if (activityTypeTableError) {
+        throw new Error(`Error deleting Activity Table: ${unitTable.message}`);
       }
 
-      const { data: otherConsumptionsWithActivity, error: activityCheckError } =
-        await this.supabase
-          .from('ConsumptionTable')
-          .select('id')
-          .eq('activity_type_id', activity_type_id);
-
-      if (activityCheckError) {
-        throw new Error(
-          `Error checking activity type references: ${activityCheckError.message}`,
-        );
-      }
-
-      if (
-        !otherConsumptionsWithActivity ||
-        otherConsumptionsWithActivity.length === 0
-      ) {
-        const { error: activityError } = await this.supabase
-          .from('ActivityTypeTable')
-          .delete()
-          .eq('id', activity_type_id);
-
-        if (activityError) {
-          console.warn(
-            `Could not delete activity type: ${activityError.message}`,
-          );
-        }
-      }
-
-      console.log('Successfully deleted consumption and related data');
       return { success: true, id: consumption_id };
     } catch (error) {
       console.error('Error in deletion process:', error);
@@ -313,8 +278,6 @@ export class SupabaseService {
     id: number,
     patchConsumptionDto: PatchConsumptionDto,
   ) {
-    console.log('Updating consumption with ID:', id);
-    console.log('Patch data:', patchConsumptionDto);
     try {
       const { data: currentConsumption, error: fetchError } =
         await this.supabase
@@ -330,9 +293,7 @@ export class SupabaseService {
           `Error fetching current consumption: ${fetchError.message}`,
         );
       }
-      console.log({ currentConsumption });
 
-      // 1. Aggiorna ActivityTypeTable se necessario
       if (
         patchConsumptionDto.activity_type_name ||
         patchConsumptionDto.emission_factor
@@ -348,11 +309,10 @@ export class SupabaseService {
         }
 
         if (Object.keys(updateFields).length > 0) {
-          // Aggiorna l'ActivityType esistente (non cambiamo l'ID)
           const { error: updateError } = await this.supabase
             .from('ActivityTypeTable')
             .update(updateFields)
-            .eq('id', currentConsumption.activity_type_id);
+            .eq('id', currentConsumption.activity_type_table_id);
 
           if (updateError) {
             throw new Error(
@@ -362,7 +322,6 @@ export class SupabaseService {
         }
       }
 
-      // 2. Aggiorna UnitTable se necessario
       if (
         patchConsumptionDto.unit &&
         patchConsumptionDto.unit !== currentConsumption.UnitTable.name
@@ -377,15 +336,11 @@ export class SupabaseService {
         }
       }
 
-      // 3. Aggiorna ConsumptionTable
       const updateData: any = {};
 
       if (patchConsumptionDto.amount !== undefined) {
         updateData.amount = patchConsumptionDto.amount;
       }
-
-      // Non aggiorniamo activity_type_id perché gli ID non cambiano
-      // Non aggiorniamo unit_id perché gli ID non cambiano
 
       if (patchConsumptionDto.co2_equivalent !== undefined) {
         updateData.co2_equivalent = patchConsumptionDto.co2_equivalent;
@@ -395,7 +350,6 @@ export class SupabaseService {
         updateData.date = patchConsumptionDto.date;
       }
 
-      console.log('ConsumptionTable update data:', updateData);
       if (Object.keys(updateData).length > 0) {
         const { data, error } = await this.supabase
           .from('ConsumptionTable')
@@ -409,8 +363,15 @@ export class SupabaseService {
 
         return data[0] as Consumption;
       }
+      const transformedConsumption = {
+        ...currentConsumption,
+        unit_table: currentConsumption.UnitTable,
+        activity_table: currentConsumption.ActivityTypeTable,
+      };
+      delete transformedConsumption.UnitTable;
+      delete transformedConsumption.ActivityTypeTable;
 
-      return currentConsumption as Consumption;
+      return transformedConsumption as Consumption;
     } catch (error) {
       console.error('Error in updateUserConsumption:', error);
       throw error;

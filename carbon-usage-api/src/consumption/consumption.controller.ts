@@ -49,7 +49,6 @@ export class ConsumptionController {
 
   @Delete('delete/:id')
   async remove(@Param('id') id: string) {
-    console.log('REQUEST RECEIVED WITH ID:', id);
     return this.consumptionService.remove(+id);
   }
 
