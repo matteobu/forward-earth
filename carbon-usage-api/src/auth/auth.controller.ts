@@ -36,16 +36,14 @@ export class AuthController {
 
   @Get('me')
   async getProfile(@Req() req: Request) {
-    console.log('Cookies received:', req.cookies);
     const token = req.cookies['jwt'];
-    console.log('JWT token found:', token ? 'Yes' : 'No');
     if (!token) {
       throw new UnauthorizedException('Not authenticated');
     }
 
     try {
       const user = await this.authService.verifyToken(token as string);
-      console.log('User verified:', user);
+
       return { user };
     } catch (error) {
       console.error('Token verification error:', error);

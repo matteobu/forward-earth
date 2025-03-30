@@ -40,7 +40,6 @@ const UserForm = ({
         if (responseData.message === 'User already exists') {
           alert('User authenticated successfully!');
         } else {
-          console.log('User created successfully:', responseData.user);
           alert('User added successfully!');
         }
       } else {

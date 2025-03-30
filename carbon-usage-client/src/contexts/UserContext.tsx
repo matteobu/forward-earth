@@ -1,8 +1,9 @@
+import { User } from '@/utils/interfaces';
 import React, { createContext, useState, useContext, ReactNode } from 'react';
 
 interface UserContextType {
-  name: string;
-  setName: (name: string) => void;
+  userContext: User;
+  setUserContext: (user: User) => void;
 }
 
 const UserContext = createContext<UserContextType | undefined>(undefined);
@@ -21,10 +22,14 @@ interface UserProviderProps {
 }
 
 export const UserProvider: React.FC<UserProviderProps> = ({ children }) => {
-  const [name, setName] = useState('');
+  const [userContext, setUserContext] = useState<User>({
+    userId: 0,
+    name: '',
+    email: '',
+  });
 
   return (
-    <UserContext.Provider value={{ name, setName }}>
+    <UserContext.Provider value={{ userContext, setUserContext }}>
       {children}
     </UserContext.Provider>
   );
