@@ -2,7 +2,7 @@ import { useAuth } from '@/contexts/AuthContext';
 import { useUser } from '../contexts/UserContext';
 import { Routes, Route } from 'react-router-dom';
 import ConsumptionForm from './consumption/ConsumptionForm';
-import ConsumptionList from './consumption/ConsumptionList';
+import ConsumptionList from './consumption/consumption-list/ConsumptionList';
 import Sidebar from './Sidebar';
 
 export default function Dashboard() {

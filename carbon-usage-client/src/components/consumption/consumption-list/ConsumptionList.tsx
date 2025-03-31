@@ -4,6 +4,9 @@ import { useNavigate } from 'react-router-dom';
 import { Consumption, ConsumptionPatchPayload } from '@/utils/types';
 import { useUser } from '@/contexts/UserContext';
 import { ACTIVITY_TYPES } from '@/utils/constants';
+import FilterSection from './FilterSection';
+import PaginationControls from './PaginationControls';
+import ConsumptionTable from './ConsumptionTable';
 
 export default function ConsumptionList() {
   const navigate = useNavigate();
@@ -405,64 +408,12 @@ export default function ConsumptionList() {
       </div>
 
       {showFilters && (
-        <div className="mb-6 p-4 bg-gray-50 border border-gray-200 rounded-md">
-          <h3 className="text-lg font-medium text-gray-700 mb-3">Filters</h3>
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                From Date
-              </label>
-              <input
-                type="date"
-                name="dateFrom"
-                value={dateFilter.from || ''}
-                onChange={handleFilterChange}
-                className="border rounded p-2 w-full"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                To Date
-              </label>
-              <input
-                type="date"
-                name="dateTo"
-                value={dateFilter.to || ''}
-                onChange={handleFilterChange}
-                className="border rounded p-2 w-full"
-              />
-            </div>
-            <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
-                Activity Type
-              </label>
-              <select
-                name="activityType"
-                value={activityFilter || ''}
-                onChange={handleFilterChange}
-                className="border rounded p-2 w-full"
-              >
-                <option value="">All Activities</option>
-                {ACTIVITY_TYPES.map((activity) => (
-                  <option
-                    key={activity.activity_type_id}
-                    value={activity.activity_type_id}
-                  >
-                    {activity.name}
-                  </option>
-                ))}
-              </select>
-            </div>
-          </div>
-          <div className="mt-4 flex justify-end">
-            <button
-              onClick={clearFilters}
-              className="px-4 py-2 bg-gray-200 text-gray-800 rounded hover:bg-gray-300 mr-2"
-            >
-              Clear Filters
-            </button>
-          </div>
-        </div>
+        <FilterSection
+          dateFilter={dateFilter}
+          activityFilter={activityFilter}
+          handleFilterChange={handleFilterChange}
+          clearFilters={clearFilters}
+        />
       )}
 
       {!consumptions || consumptions.length === 0 ? (
@@ -488,230 +439,31 @@ export default function ConsumptionList() {
             </p>
           </div>
 
-          <div className="overflow-x-auto">
-            <table className="min-w-full bg-white border border-gray-200 rounded-md">
-              <thead className="bg-gray-50">
-                <tr>
-                  <th
-                    className="py-3 px-4 text-left border-b w-[25%] cursor-pointer hover:bg-gray-100"
-                    onClick={() => handleSort('activity_table.name')}
-                  >
-                    Activity {renderSortIndicator('activity_table.name')}
-                  </th>
-                  <th
-                    className="py-3 px-4 text-left border-b w-[15%] cursor-pointer hover:bg-gray-100"
-                    onClick={() => handleSort('amount')}
-                  >
-                    Amount {renderSortIndicator('amount')}
-                  </th>
-                  <th
-                    className="py-3 px-4 text-left border-b w-[15%] cursor-pointer hover:bg-gray-100"
-                    onClick={() => handleSort('date')}
-                  >
-                    Date {renderSortIndicator('date')}
-                  </th>
-                  <th
-                    className="py-3 px-4 text-left border-b w-[20%] cursor-pointer hover:bg-gray-100"
-                    onClick={() => handleSort('co2_equivalent')}
-                  >
-                    CO2 Impact {renderSortIndicator('co2_equivalent')}
-                  </th>
-                  <th className="py-3 px-4 text-left border-b w-[25%]">
-                    Actions
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                {consumptions.map((consumption) => (
-                  <tr key={consumption.id} className="hover:bg-gray-50">
-                    {editingId === consumption.id ? (
-                      <>
-                        <td className="py-3 px-4 border-b w-[25%]">
-                          <select
-                            name="activity_type_table_id"
-                            value={editForm?.activity_type_table_id}
-                            onChange={handleInputChange}
-                            className="border rounded p-1 w-full"
-                          >
-                            {ACTIVITY_TYPES.map((activity) => (
-                              <option
-                                key={activity.activity_type_id}
-                                value={activity.activity_type_id}
-                              >
-                                {activity.name}
-                              </option>
-                            ))}
-                          </select>
-                        </td>
-                        <td className="py-3 px-4 border-b w-[15%]">
-                          <div className="flex items-center">
-                            <input
-                              type="number"
-                              name="amount"
-                              value={editForm?.amount}
-                              onChange={handleInputChange}
-                              className="border rounded p-1 max-w-[100px]"
-                              step="0.01"
-                              min="0"
-                            />
-                            <span className="ml-2">
-                              {consumption.unit_table?.name || ''}
-                            </span>
-                          </div>
-                        </td>
-                        <td className="py-3 px-4 border-b w-[15%]">
-                          <input
-                            type="date"
-                            name="date"
-                            value={editForm?.date}
-                            onChange={handleInputChange}
-                            className="border rounded p-1 w-full"
-                          />
-                        </td>
-                        <td className="py-3 px-4 border-b w-[20%]">
-                          <span className="font-medium">
-                            {consumption.co2_equivalent.toFixed(2)}
-                          </span>{' '}
-                          kg CO<sub>2</sub>e
-                        </td>
-                        <td className="py-3 px-4 border-b w-[25%]">
-                          <div className="flex space-x-2">
-                            <button
-                              onClick={handleSaveEdit}
-                              disabled={isSubmitting}
-                              className={`text-green-500 hover:text-green-700 mr-2 ${
-                                isSubmitting
-                                  ? 'opacity-50 cursor-not-allowed'
-                                  : ''
-                              }`}
-                            >
-                              {isSubmitting ? 'Saving...' : 'Save'}
-                            </button>
-                            <button
-                              onClick={handleCancelEdit}
-                              className="text-gray-500 hover:text-gray-700"
-                            >
-                              Cancel
-                            </button>
-                          </div>
-                        </td>
-                      </>
-                    ) : (
-                      <>
-                        <td className="py-3 px-4 border-b w-[25%]">
-                          {consumption.activity_table
-                            ? consumption.activity_table.name
-                            : 'N/A'}
-                        </td>
-                        <td className="py-3 px-4 border-b w-[15%]">
-                          {consumption.amount}{' '}
-                          {consumption.unit_table
-                            ? consumption.unit_table.name
-                            : ''}
-                        </td>
-                        <td className="py-3 px-4 border-b w-[15%]">
-                          {formatDate(consumption.date)}
-                        </td>
-                        <td className="py-3 px-4 border-b w-[20%]">
-                          <span className="font-medium">
-                            {consumption.co2_equivalent.toFixed(2)}
-                          </span>{' '}
-                          kg CO<sub>2</sub>e
-                        </td>
-                        <td className="py-3 px-4 border-b w-[25%]">
-                          <div className="flex space-x-2">
-                            <button
-                              onClick={() => handleDelete(consumption.id)}
-                              className="text-red-500 hover:text-red-700 mr-2"
-                            >
-                              Delete
-                            </button>
-                            <button
-                              onClick={() => handleEdit(consumption)}
-                              className="text-blue-500 hover:text-blue-700"
-                            >
-                              Edit
-                            </button>
-                          </div>
-                        </td>
-                      </>
-                    )}
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+          <ConsumptionTable
+            consumptions={consumptions}
+            editingId={editingId}
+            editForm={editForm}
+            isSubmitting={isSubmitting}
+            handleSort={handleSort}
+            handleInputChange={handleInputChange}
+            handleSaveEdit={handleSaveEdit}
+            handleCancelEdit={handleCancelEdit}
+            handleDelete={handleDelete}
+            handleEdit={handleEdit}
+            formatDate={formatDate}
+            renderSortIndicator={renderSortIndicator}
+          />
 
           {/* Pagination Controls */}
-          <div className="mt-6 flex justify-between items-center">
-            <div className="flex items-center space-x-2">
-              <span className="text-sm text-gray-700">
-                Showing {consumptions.length} of {totalItems} items
-              </span>
-              <select
-                value={itemsPerPage}
-                onChange={(e) => setItemsPerPage(Number(e.target.value))}
-                className="border rounded p-1 ml-2"
-              >
-                <option value="5">5 per page</option>
-                <option value="10">10 per page</option>
-                <option value="20">20 per page</option>
-                <option value="50">50 per page</option>
-              </select>
-            </div>
-            <div className="flex items-center space-x-1">
-              <button
-                onClick={() => handlePageChange(1)}
-                disabled={currentPage === 1}
-                className={`px-3 py-1 rounded ${
-                  currentPage === 1
-                    ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
-                    : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-                }`}
-              >
-                &laquo;
-              </button>
-              <button
-                onClick={() => handlePageChange(currentPage - 1)}
-                disabled={currentPage === 1}
-                className={`px-3 py-1 rounded ${
-                  currentPage === 1
-                    ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
-                    : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-                }`}
-              >
-                &lsaquo;
-              </button>
-
-              {/* Current Page Display */}
-              <span className="px-3 py-1 bg-blue-500 text-white rounded">
-                {currentPage}
-              </span>
-
-              <button
-                onClick={() => handlePageChange(currentPage + 1)}
-                disabled={currentPage === totalPages}
-                className={`px-3 py-1 rounded ${
-                  currentPage === totalPages
-                    ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
-                    : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-                }`}
-              >
-                &rsaquo;
-              </button>
-              <button
-                onClick={() => handlePageChange(totalPages)}
-                disabled={currentPage === totalPages}
-                className={`px-3 py-1 rounded ${
-                  currentPage === totalPages
-                    ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
-                    : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-                }`}
-              >
-                &raquo;
-              </button>
-            </div>
-          </div>
+          <PaginationControls
+            currentPage={currentPage}
+            totalPages={totalPages}
+            consumptions={consumptions}
+            totalItems={totalItems}
+            itemsPerPage={itemsPerPage}
+            setItemsPerPage={setItemsPerPage}
+            handlePageChange={handlePageChange}
+          />
         </>
       )}
     </div>
