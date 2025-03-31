@@ -180,26 +180,43 @@ export class SupabaseService {
   }
 
   async createConsumption(consumptionData: CreateConsumptionDto) {
+    // FIXME: Here the table has Liters instead of liters
+    consumptionData.unit =
+      consumptionData.unit === 'liters' ? 'Liters' : consumptionData.unit;
+
     const { data: unitData, error: unitError } = await this.supabase
       .from('UnitTable')
       .select('id')
-      .eq('name', consumptionData.unit)
-      .single();
+      .eq('name', consumptionData.unit);
+
+    const firstUnit = unitData?.[0];
 
     if (unitError) {
-      // TODO: Handle when the unit already exists
       throw new Error(`Error creating unit: ${unitError.message}`);
     }
-    const unitId = unitData.id;
+    const unitId = firstUnit;
+    const { data: lastRecord, error: lastRecordError } = await this.supabase
+      .from('ConsumptionTable')
+      .select('id')
+      .order('id', { ascending: false })
+      .limit(1)
+      .single();
+
+    if (lastRecordError) {
+      throw new Error(`Error creating unit: ${lastRecordError.message}`);
+    }
+
+    const newId = lastRecord ? lastRecord.id + 1 : 1;
 
     const { data, error } = await this.supabase
       .from('ConsumptionTable')
       .insert([
         {
+          id: newId,
           user_id: consumptionData.user_id,
           amount: consumptionData.amount,
           activity_type_table_id: consumptionData.activity_type_id,
-          unit_id: unitId,
+          unit_id: unitId.id,
           co2_equivalent: consumptionData.co2_equivalent,
           date: consumptionData.date,
           created_at: new Date().toISOString(),
@@ -210,7 +227,6 @@ export class SupabaseService {
     if (error) {
       throw new Error(`Error creating consumption: ${error.message}`);
     }
-
     return data[0] as {
       id: number;
       user_id: number;
@@ -438,5 +454,18 @@ export class SupabaseService {
       console.error('Error in getPaginatedData:', error);
       throw error;
     }
+  }
+
+  async getCompanyData(userId: number) {
+    const { data: companyData, error: companyError } = await this.supabase
+      .from('CompanyTable')
+      .select('*')
+      .eq('user_id', userId);
+
+    if (companyError) {
+      throw new Error(`Error deleting consumption: ${companyError.message}`);
+    }
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+    return companyData;
   }
 }

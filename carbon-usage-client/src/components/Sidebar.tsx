@@ -3,7 +3,6 @@ import React from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import {
   Building2,
-  Database,
   FileText,
   LayoutDashboard,
   ShoppingBag,
@@ -114,18 +113,13 @@ export const NAV_ITEMS: NavItemOrDivider[] = [
     path: '/dashboard/consumptions/list',
   },
   {
-    title: 'Data collection',
-    icon: <Database size={20} className="text-gray-500" />,
-    path: '/data-collection',
-  },
-  {
     divider: true,
     heading: 'Product Footprint',
   },
   {
-    title: 'Product Catalogue',
+    title: 'Products Catalogue',
     icon: <ShoppingBag size={20} className="text-gray-500" />,
-    path: '/product-catalogue',
+    path: '/dashboard/products-catalogue',
   },
   {
     title: 'PCF assessment',
@@ -137,9 +131,9 @@ export const NAV_ITEMS: NavItemOrDivider[] = [
     heading: 'Manage',
   },
   {
-    title: 'Company',
+    title: 'Company Dashboard',
     icon: <Building2 size={20} className="text-gray-500" />,
-    path: '/company',
+    path: '/dashboard/company-dashboard',
   },
   {
     title: 'Users',

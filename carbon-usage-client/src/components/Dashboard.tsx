@@ -7,6 +7,9 @@ import Sidebar from './Sidebar';
 import { ActivityTypeProvider } from '@/contexts/ActivityTypeContext';
 import { LogOut } from 'lucide-react';
 import MainPage from './main-page/MainPage';
+import ConsumptionDataCollection from './consumption/ConsumptionDataCollection';
+import ProductsCatalogue from './products-catalogue/ProductsCatalogue';
+import CompanyDashboard from './company/CompanyDashboard';
 
 export default function Dashboard() {
   const { logout } = useAuth();
@@ -39,12 +42,17 @@ export default function Dashboard() {
               <Route path="consumptions/new" element={<ConsumptionForm />} />
               <Route
                 path="consumptions/data-collection"
-                element={<ConsumptionList />}
+                element={<ConsumptionDataCollection />}
               />
               <Route
                 path="consumptions/:id/edit"
                 element={<ConsumptionForm />}
               />
+              <Route
+                path="products-catalogue"
+                element={<ProductsCatalogue />}
+              />
+              <Route path="company-dashboard" element={<CompanyDashboard />} />
             </Routes>
           </ActivityTypeProvider>
         </main>
