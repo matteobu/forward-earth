@@ -18,6 +18,7 @@ import EmptyState from './display/EmptyState';
 import TotalCO2Impact from './display/TotalCO2Impact';
 import LoadingSpinner from './display/LoadingSpinner';
 import ErrorMessage from './display/ErrorMessage';
+import FilterIcons from './filters/FilterIcons';
 
 export default function ConsumptionList() {
   const {
@@ -112,26 +113,27 @@ export default function ConsumptionList() {
 
   return (
     <div>
-      <ConsumptionHeader
-        showFilters={showFilters}
-        toggleFilters={toggleFilters}
-      />
-
-      {/* Filters */}
-      {showFilters && (
-        <FilterSection
-          dateFilter={dateFilter}
-          activityFilter={activityFilter}
-          handleFilterChange={handleFilterChange}
-          clearFilters={clearFilters}
-        />
-      )}
+      <ConsumptionHeader />
 
       {!consumptions || consumptions.length === 0 ? (
         <EmptyState />
       ) : (
         <>
           <TotalCO2Impact totalCO2={calculateTotalCO2(consumptions)} />
+          <FilterIcons
+            showFilters={showFilters}
+            toggleFilters={toggleFilters}
+          />
+
+          {/* Filters */}
+          {showFilters && (
+            <FilterSection
+              dateFilter={dateFilter}
+              activityFilter={activityFilter}
+              handleFilterChange={handleFilterChange}
+              clearFilters={clearFilters}
+            />
+          )}
           {/* Consumption Table */}
           <ConsumptionTable
             consumptions={consumptions}

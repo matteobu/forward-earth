@@ -2,6 +2,7 @@
 import React, { useEffect, useState } from 'react';
 import { ActivityType, Consumption } from '@/utils/types';
 import { activityTypeService } from '@/services/activityTypeService';
+import { Ban, Pencil, Save, Trash2 } from 'lucide-react';
 
 interface ConsumptionRowProps {
   consumption: Consumption;
@@ -111,13 +112,13 @@ const ConsumptionTableRow: React.FC<ConsumptionRowProps> = ({
                 isSubmitting ? 'opacity-50 cursor-not-allowed' : ''
               }`}
             >
-              {isSubmitting ? 'Saving...' : 'Save'}
+              {isSubmitting ? 'Saving...' : <Save />}
             </button>
             <button
               onClick={handleCancelEdit}
               className="text-gray-500 hover:text-gray-700"
             >
-              Cancel
+              <Ban />
             </button>
           </div>
         </td>
@@ -147,15 +148,15 @@ const ConsumptionTableRow: React.FC<ConsumptionRowProps> = ({
         <div className="flex space-x-2">
           <button
             onClick={() => handleDelete(consumption.id)}
-            className="text-red-500 hover:text-red-700 mr-2"
+            className="text-purple-500 hover:text-purple-700 mr-1 border-2 border-purple-100 p-1"
           >
-            Delete
+            <Trash2 size={16} />
           </button>
           <button
             onClick={() => handleEdit(consumption)}
-            className="text-blue-500 hover:text-blue-700"
+            className="text-orange-500 hover:text-orange-700 border-2 border-orange-100 p-1"
           >
-            Edit
+            <Pencil size={16} />
           </button>
         </div>
       </td>

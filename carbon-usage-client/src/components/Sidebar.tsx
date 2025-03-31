@@ -1,12 +1,11 @@
-import React, { useState } from 'react';
+/* eslint-disable react-refresh/only-export-components */
+import React from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import {
   Building2,
-  ChevronDown,
-  ChevronRight,
-  ClipboardCheck,
   Database,
   FileText,
+  LayoutDashboard,
   ShoppingBag,
   SquarePlus,
   TableProperties,
@@ -17,80 +16,10 @@ import { NavItem, NavItemOrDivider, SidebarProps } from '@/utils/interfaces';
 const Sidebar: React.FC<SidebarProps> = ({ className = '' }) => {
   const navigate = useNavigate();
   const location = useLocation();
-  const [expandedGroups, setExpandedGroups] = useState<Record<string, boolean>>(
-    {
-      Consumption: true,
-      'Product Footprint': true,
-      Manage: true,
-    }
-  );
-
-  const toggleGroup = (heading: string) => {
-    setExpandedGroups((prev) => ({
-      ...prev,
-      [heading]: !prev[heading],
-    }));
-  };
-
-  let currentHeading = '';
-  const NAV_ITEMS: NavItemOrDivider[] = [
-    {
-      divider: true,
-      heading: 'Consumption',
-    },
-    {
-      title: 'Insert Consumption',
-      icon: <SquarePlus size={20} className="text-indigo-600" />,
-      path: '/dashboard/consumptions/new',
-    },
-    {
-      title: 'Consumptions List',
-      icon: <TableProperties size={20} className="text-gray-500" />,
-      path: '/dashboard/consumptions/list',
-    },
-    {
-      title: 'Emission tracker',
-      icon: <ClipboardCheck size={20} className="text-purple-600" />,
-      path: '/emission-tracker',
-    },
-    {
-      title: 'Data collection',
-      icon: <Database size={20} className="text-gray-500" />,
-      path: '/data-collection',
-    },
-    {
-      divider: true,
-      heading: 'Product Footprint',
-    },
-    {
-      title: 'Product Catalogue',
-      icon: <ShoppingBag size={20} className="text-gray-500" />,
-      path: '/product-catalogue',
-    },
-    {
-      title: 'PCF assessment',
-      icon: <FileText size={20} className="text-gray-500" />,
-      path: '/pcf-assessment',
-    },
-    {
-      divider: true,
-      heading: 'Manage',
-    },
-    {
-      title: 'Company',
-      icon: <Building2 size={20} className="text-gray-500" />,
-      path: '/company',
-    },
-    {
-      title: 'Users',
-      icon: <Users size={20} className="text-gray-500" />,
-      path: '/users',
-    },
-  ];
 
   return (
     <aside
-      className={`bg-white h-auto w-full min-h-screen shadow-lg flex flex-col pt-6 ${className} rounded-2xl`}
+      className={`bg-gray-50 h-auto w-full min-h-screen shadow-lg flex flex-col pt-6 ${className} rounded-2xl`}
     >
       {/* Logo and Brand */}
       <div className="px-6 mb-8 flex items-center justify-between">
@@ -111,7 +40,6 @@ const Sidebar: React.FC<SidebarProps> = ({ className = '' }) => {
         <ul className="space-y-1">
           {NAV_ITEMS.map((item, index) => {
             if ('divider' in item && item.divider) {
-              currentHeading = item.heading || '';
               return (
                 <li key={`divider-${index}`} className="pt-4 mt-4">
                   {item.heading && (
@@ -119,18 +47,6 @@ const Sidebar: React.FC<SidebarProps> = ({ className = '' }) => {
                       <h3 className="text-xs font-medium text-gray-500 uppercase tracking-wider">
                         {item.heading}
                       </h3>
-                      <button
-                        onClick={() =>
-                          item.heading && toggleGroup(item.heading)
-                        }
-                        className="bg-white text-gray-400 hover:text-gray-600 p-1 rounded-lg focus:outline-none"
-                      >
-                        {expandedGroups[item.heading] ? (
-                          <ChevronDown size={14} />
-                        ) : (
-                          <ChevronRight size={14} />
-                        )}
-                      </button>
                     </div>
                   )}
                 </li>
@@ -138,10 +54,6 @@ const Sidebar: React.FC<SidebarProps> = ({ className = '' }) => {
             }
 
             const navItem = item as NavItem;
-
-            if (!expandedGroups[currentHeading]) {
-              return null;
-            }
 
             return (
               <li key={`nav-${index}`}>
@@ -175,3 +87,62 @@ const Sidebar: React.FC<SidebarProps> = ({ className = '' }) => {
 };
 
 export default Sidebar;
+
+export const NAV_ITEMS: NavItemOrDivider[] = [
+  {
+    divider: true,
+    heading: 'Dashboard',
+  },
+  {
+    title: 'Dashboard',
+    icon: <LayoutDashboard size={20} className="text-indigo-600" />,
+    path: '/dashboard',
+  },
+  {
+    divider: true,
+    heading: 'Company Footprint',
+  },
+  {
+    title: 'Insert Consumption',
+    icon: <SquarePlus size={20} className="text-indigo-600" />,
+    path: '/dashboard/consumptions/new',
+  },
+  {
+    title: 'Consumptions List',
+    icon: <TableProperties size={20} className="text-gray-500" />,
+    path: '/dashboard/consumptions/list',
+  },
+  {
+    title: 'Data collection',
+    icon: <Database size={20} className="text-gray-500" />,
+    path: '/data-collection',
+  },
+  {
+    divider: true,
+    heading: 'Product Footprint',
+  },
+  {
+    title: 'Product Catalogue',
+    icon: <ShoppingBag size={20} className="text-gray-500" />,
+    path: '/product-catalogue',
+  },
+  {
+    title: 'PCF assessment',
+    icon: <FileText size={20} className="text-gray-500" />,
+    path: '/pcf-assessment',
+  },
+  {
+    divider: true,
+    heading: 'Manage',
+  },
+  {
+    title: 'Company',
+    icon: <Building2 size={20} className="text-gray-500" />,
+    path: '/company',
+  },
+  {
+    title: 'Users',
+    icon: <Users size={20} className="text-gray-500" />,
+    path: '/users',
+  },
+];

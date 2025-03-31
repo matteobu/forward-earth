@@ -5,32 +5,36 @@ import ConsumptionForm from './consumption/ConsumptionForm';
 import ConsumptionList from './consumption/consumption-list/ConsumptionList';
 import Sidebar from './Sidebar';
 import { ActivityTypeProvider } from '@/contexts/ActivityTypeContext';
+import { LogOut } from 'lucide-react';
+import MainPage from './MainPage';
 
 export default function Dashboard() {
   const { logout } = useAuth();
   const { userContext } = useUser();
 
   return (
-    <div className="flex h-screen w-screen">
-      <aside className="w-64 bg-gray-900 text-white p-4 flex flex-col">
+    <div className="flex h-screen w-screen bg-indigo-50">
+      <aside className="w-64 bg-indigo-50 text-white p-4 flex flex-col">
         <Sidebar />
       </aside>
 
       <div className="flex-1 flex flex-col">
-        <header className="bg-gray-800 text-white p-4 flex items-center justify-between">
-          <h2 className="text-lg font-semibold">Welcome {userContext.name}</h2>
+        <header className="bg-gray-50 text-white p-4 flex items-center justify-between rounded-2xl mt-4 mb-1">
+          <h2 className="text-lg text-gray-700 font-semibold">
+            Welcome {userContext.name}
+          </h2>
           <button
-            className="px-4 py-2 bg-red-500 hover:bg-red-600 rounded text-white"
+            className="p-1 bg-red-500 hover:bg-red-600 rounded text-white"
             onClick={logout}
           >
-            LOGOUT
+            <LogOut size={16} />
           </button>
         </header>
 
-        <main className="flex-1 p-6 bg-gray-100 overflow-auto">
+        <main className="flex-1 p-6 bg-gray-50 overflow-auto rounded-2xl">
           <ActivityTypeProvider>
             <Routes>
-              <Route index element={<DashboardHome />} />
+              <Route index element={<MainPage />} />
               <Route path="consumptions/list" element={<ConsumptionList />} />
               <Route path="consumptions/new" element={<ConsumptionForm />} />
               <Route
@@ -41,18 +45,6 @@ export default function Dashboard() {
           </ActivityTypeProvider>
         </main>
       </div>
-    </div>
-  );
-}
-
-// Componente semplice per la home della dashboard
-function DashboardHome() {
-  return (
-    <div>
-      <h3 className="text-2xl font-semibold">Dashboard</h3>
-      <p className="mt-4 text-lg">
-        Benvenuto nella tua dashboard. Usa il menu laterale per navigare.
-      </p>
     </div>
   );
 }
