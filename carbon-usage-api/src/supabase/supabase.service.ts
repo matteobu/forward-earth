@@ -7,6 +7,7 @@ import {
   CreateConsumptionDto,
   PatchConsumptionDto,
 } from 'src/consumption/dto/create-consumption.dto';
+import { ActivityTypeTable } from 'src/activity-types/entities/activity-type.entity';
 
 dotenv.config();
 
@@ -49,6 +50,37 @@ export class SupabaseService {
       throw new Error('Error creating user in Supabase');
     }
     return data as User;
+  }
+
+  // ***
+  // ACTIVITY TYPE ROUTE
+  // ***
+  async getAllActivityType() {
+    const { data: activityTypeTableData, error: activityTypeTableError } =
+      await this.supabase.from('ActivityTypeTable').select('*');
+
+    if (activityTypeTableError) {
+      console.error('Error fetching consumptions:', activityTypeTableError);
+      throw new Error(
+        `Error fetching consumptions: ${activityTypeTableError.message}`,
+      );
+    }
+    return activityTypeTableData as ActivityTypeTable;
+  }
+
+  // ***
+  // UNIT ROUTE
+  // ***
+  async getAllUnit() {
+    const { data: unitTableData, error: unitTableError } = await this.supabase
+      .from('UnitTable')
+      .select('*');
+
+    if (unitTableError) {
+      console.error('Error fetching consumptions:', unitTableError);
+      throw new Error(`Error fetching consumptions: ${unitTableError.message}`);
+    }
+    return unitTableData as { id: number; name: string };
   }
 
   // ***
@@ -150,38 +182,15 @@ export class SupabaseService {
   async createConsumption(consumptionData: CreateConsumptionDto) {
     const { data: unitData, error: unitError } = await this.supabase
       .from('UnitTable')
-      .insert([{ name: consumptionData.unit }])
       .select('id')
+      .eq('name', consumptionData.unit)
       .single();
 
     if (unitError) {
+      // TODO: Handle when the unit already exists
       throw new Error(`Error creating unit: ${unitError.message}`);
     }
-
     const unitId = unitData.id;
-    let activityTypeTableId = 0;
-    if (consumptionData.activity_name && consumptionData.emission_factor) {
-      const { data: activityTypeData, error: activityTypeError } =
-        await this.supabase
-          .from('ActivityTypeTable')
-          .insert([
-            {
-              name: consumptionData.activity_name,
-              emission_factor: consumptionData.emission_factor,
-              activity_type_id: consumptionData.activity_type_id,
-            },
-          ])
-          .select('id')
-          .single();
-
-      if (activityTypeError) {
-        console.error('ActivityType insertion error:', activityTypeError);
-        throw new Error(
-          `Error creating activity type: ${activityTypeError.message}`,
-        );
-      }
-      activityTypeTableId = activityTypeData.id;
-    }
 
     const { data, error } = await this.supabase
       .from('ConsumptionTable')
@@ -189,7 +198,7 @@ export class SupabaseService {
         {
           user_id: consumptionData.user_id,
           amount: consumptionData.amount,
-          activity_type_table_id: activityTypeTableId,
+          activity_type_table_id: consumptionData.activity_type_id,
           unit_id: unitId,
           co2_equivalent: consumptionData.co2_equivalent,
           date: consumptionData.date,
@@ -216,25 +225,6 @@ export class SupabaseService {
   }
 
   async deleteUserConsumption(consumption_id: number) {
-    const { data: consumptionData, error: fetchError } = await this.supabase
-      .from('ConsumptionTable')
-      .select('id, unit_id, activity_type_table_id')
-      .eq('id', consumption_id)
-      .single();
-
-    if (fetchError) {
-      console.error('Error fetching consumption details:', fetchError);
-      throw new Error(
-        `Error fetching consumption details: ${fetchError.message}`,
-      );
-    }
-
-    if (!consumptionData) {
-      throw new Error(`Consumption with ID ${consumption_id} not found`);
-    }
-
-    const { unit_id, activity_type_table_id } = consumptionData;
-
     try {
       const { error: consumptionError } = await this.supabase
         .from('ConsumptionTable')
@@ -245,26 +235,6 @@ export class SupabaseService {
         throw new Error(
           `Error deleting consumption: ${consumptionError.message}`,
         );
-      }
-
-      const { error: activityTypeTableError } = await this.supabase
-        .from('ActivityTypeTable')
-        .delete()
-        .eq('id', activity_type_table_id);
-
-      if (activityTypeTableError) {
-        throw new Error(
-          `Error deleting Activity Table: ${activityTypeTableError.message}`,
-        );
-      }
-
-      const { error: unitTable } = await this.supabase
-        .from('UnitTable')
-        .delete()
-        .eq('id', unit_id);
-
-      if (activityTypeTableError) {
-        throw new Error(`Error deleting Activity Table: ${unitTable.message}`);
       }
 
       return { success: true, id: consumption_id };
@@ -448,7 +418,7 @@ export class SupabaseService {
           transformed.unit_table = transformed.UnitTable;
           delete transformed.UnitTable;
         }
-        console.log(transformed);
+
         return transformed as Consumption[];
       });
 

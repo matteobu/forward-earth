@@ -21,13 +21,6 @@ import { Consumption } from './entities/consumption.entity';
 export class ConsumptionController {
   constructor(private readonly consumptionService: ConsumptionService) {}
 
-  // @Get(':id') // Get all consumptions based on the user_id with optional pagination, sorting and filtering
-  // async getConsumptionInfo(@Param('id') user_id: number) {
-  //   const consumption: Consumption[] =
-  //     await this.consumptionService.getUserConsumption(user_id);
-  //   return consumption;
-  // }
-
   @Get(':id') // Get all consumptions based on the user_id with optional pagination, sorting and filtering
   async getConsumptionInfo(
     @Param('id') user_id: number,
@@ -47,7 +40,6 @@ export class ConsumptionController {
       activityType ||
       page ||
       limit;
-    console.log(hasAdvancedParams);
 
     if (!hasAdvancedParams) {
       const consumption: Consumption[] =

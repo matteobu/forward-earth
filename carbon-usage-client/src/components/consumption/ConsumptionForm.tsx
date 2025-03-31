@@ -2,13 +2,15 @@
 // components/consumption/ConsumptionForm.tsx
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ACTIVITY_TYPES } from '@/utils/constants';
 import { ActivityType } from '@/utils/types';
 import { useUser } from '@/contexts/UserContext';
+import { useActivityTypeContext } from '@/contexts/ActivityTypeContext';
 
 export default function ConsumptionForm() {
   const navigate = useNavigate();
   const { userContext } = useUser();
+  const { activityTypes } = useActivityTypeContext();
+
   const [formData, setFormData] = useState({
     amount: '',
     activity_type_id: '',
@@ -21,7 +23,7 @@ export default function ConsumptionForm() {
 
   useEffect(() => {
     if (formData.activity_type_id) {
-      const activity = ACTIVITY_TYPES.find(
+      const activity = activityTypes.find(
         (type) => type.activity_type_id.toString() === formData.activity_type_id
       );
       setSelectedActivity(activity || null);
@@ -111,7 +113,7 @@ export default function ConsumptionForm() {
             required
           >
             <option value="">Select type...</option>
-            {ACTIVITY_TYPES.map((type) => (
+            {activityTypes.map((type) => (
               <option key={type.activity_type_id} value={type.activity_type_id}>
                 {type.name}
               </option>

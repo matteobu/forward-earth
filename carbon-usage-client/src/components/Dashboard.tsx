@@ -4,6 +4,7 @@ import { Routes, Route } from 'react-router-dom';
 import ConsumptionForm from './consumption/ConsumptionForm';
 import ConsumptionList from './consumption/consumption-list/ConsumptionList';
 import Sidebar from './Sidebar';
+import { ActivityTypeProvider } from '@/contexts/ActivityTypeContext';
 
 export default function Dashboard() {
   const { logout } = useAuth();
@@ -27,12 +28,17 @@ export default function Dashboard() {
         </header>
 
         <main className="flex-1 p-6 bg-gray-100 overflow-auto">
-          <Routes>
-            <Route index element={<DashboardHome />} />
-            <Route path="consumptions/list" element={<ConsumptionList />} />
-            <Route path="consumptions/new" element={<ConsumptionForm />} />
-            <Route path="consumptions/:id/edit" element={<ConsumptionForm />} />
-          </Routes>
+          <ActivityTypeProvider>
+            <Routes>
+              <Route index element={<DashboardHome />} />
+              <Route path="consumptions/list" element={<ConsumptionList />} />
+              <Route path="consumptions/new" element={<ConsumptionForm />} />
+              <Route
+                path="consumptions/:id/edit"
+                element={<ConsumptionForm />}
+              />
+            </Routes>
+          </ActivityTypeProvider>
         </main>
       </div>
     </div>

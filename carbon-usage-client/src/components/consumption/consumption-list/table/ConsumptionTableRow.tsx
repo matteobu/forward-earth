@@ -1,7 +1,7 @@
 // ConsumptionRow.tsx
-import React from 'react';
-import { Consumption } from '@/utils/types';
-import { ACTIVITY_TYPES } from '@/utils/constants';
+import React, { useEffect, useState } from 'react';
+import { ActivityType, Consumption } from '@/utils/types';
+import { activityTypeService } from '@/services/activityTypeService';
 
 interface ConsumptionRowProps {
   consumption: Consumption;
@@ -34,6 +34,25 @@ const ConsumptionTableRow: React.FC<ConsumptionRowProps> = ({
   handleEdit,
   formatDate,
 }) => {
+  const [allActivityType, setAllActivityType] = useState<ActivityType[]>([]);
+
+  useEffect(() => {
+    const fetchData = async () => {
+      if (isEditing) {
+        try {
+          const _allActivityType =
+            await activityTypeService.fetchAllActivityType();
+
+          setAllActivityType(_allActivityType);
+        } catch (error) {
+          console.error('Error fetching activity types:', error);
+        }
+      }
+    };
+
+    fetchData();
+  }, [isEditing]);
+
   if (isEditing) {
     return (
       <tr className="hover:bg-gray-50">
@@ -44,7 +63,7 @@ const ConsumptionTableRow: React.FC<ConsumptionRowProps> = ({
             onChange={handleInputChange}
             className="border rounded p-1 w-full"
           >
-            {ACTIVITY_TYPES.map((activity) => (
+            {allActivityType.map((activity) => (
               <option
                 key={activity.activity_type_id}
                 value={activity.activity_type_id}
