@@ -33,4 +33,94 @@ export class ConsumptionService {
   async getUserConsumption(user_id: number) {
     return this.supabaseService.getUserConsumption(user_id);
   }
+
+  async getUserConsumptionPaginated(params: {
+    user_id: number;
+    page: number;
+    limit: number;
+    sortBy: string;
+    sortOrder: 'ASC' | 'DESC';
+    dateFrom?: string;
+    dateTo?: string;
+    activityType?: number;
+  }) {
+    try {
+      const filters: Record<string, any> = {
+        user_id: params.user_id,
+      };
+
+      if (params.dateFrom) {
+        filters['gte_date'] = params.dateFrom;
+      }
+
+      if (params.dateTo) {
+        filters['lte_date'] = params.dateTo;
+      }
+
+      if (params.activityType) {
+        filters['activity_type_table_id'] = params.activityType;
+      }
+
+      const isNestedField = params.sortBy.includes('.');
+
+      const orderBy = isNestedField ? 'date' : params.sortBy;
+
+      const result = await this.supabaseService.getPaginatedData(
+        'ConsumptionTable',
+        {
+          select: '*, ActivityTypeTable(*), UnitTable(*)',
+          filters,
+          page: params.page,
+          limit: params.limit,
+          orderBy: orderBy,
+          ascending: params.sortOrder === 'ASC',
+        },
+      );
+
+      let sortedData = result.data;
+      if (isNestedField) {
+        const [table, field] = params.sortBy.split('.');
+        sortedData = [...result.data].sort((a, b) => {
+          const valueA = a[table]?.[field];
+          const valueB = b[table]?.[field];
+
+          if (params.sortOrder === 'ASC') {
+            return valueA > valueB ? 1 : -1;
+          } else {
+            return valueA < valueB ? 1 : -1;
+          }
+        });
+      }
+
+      const processedData = sortedData.map(
+        (consumption: {
+          amount: number;
+          activity_table?: { emission_factor: number };
+          [key: string]: any;
+        }) => {
+          if (
+            consumption.amount &&
+            consumption.activity_table &&
+            consumption.activity_table.emission_factor
+          ) {
+            const co2_equivalent =
+              consumption.amount * consumption.activity_table.emission_factor;
+            return {
+              ...consumption,
+              co2_equivalent: co2_equivalent,
+            };
+          }
+          return consumption;
+        },
+      );
+
+      return {
+        data: processedData,
+        meta: result.meta,
+      };
+    } catch (error) {
+      console.error('Error in getUserConsumptionPaginated:', error);
+      throw error;
+    }
+  }
 }

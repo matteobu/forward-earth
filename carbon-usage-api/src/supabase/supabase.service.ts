@@ -377,4 +377,93 @@ export class SupabaseService {
       throw error;
     }
   }
+
+  async getPaginatedData(
+    table: string,
+    options: {
+      select?: string;
+      filters?: Record<string, any>;
+      page: number;
+      limit: number;
+      orderBy?: string;
+      ascending?: boolean;
+      extraQuery?: (query: any) => any;
+    },
+  ) {
+    try {
+      const {
+        select = '*',
+        filters = {},
+        page,
+        limit,
+        orderBy,
+        ascending = true,
+        extraQuery,
+      } = options;
+
+      const from = (page - 1) * limit;
+      const to = from + limit - 1;
+
+      let query = this.supabase.from(table).select(select, { count: 'exact' });
+
+      for (const [key, value] of Object.entries(filters)) {
+        if (value !== undefined && value !== null) {
+          if (key.startsWith('gte_')) {
+            const field = key.replace('gte_', '');
+            query = query.gte(field, value);
+          } else if (key.startsWith('lte_')) {
+            const field = key.replace('lte_', '');
+            query = query.lte(field, value);
+          } else {
+            query = query.eq(key, value);
+          }
+        }
+      }
+
+      if (extraQuery) {
+        query = extraQuery(query);
+      }
+
+      if (orderBy) {
+        query = query.order(orderBy, { ascending });
+      }
+
+      query = query.range(from, to);
+
+      const { data, error, count } = await query;
+
+      if (error) {
+        throw new Error(`Error fetching paginated data: ${error.message}`);
+      }
+
+      const transformedData = data.map((item) => {
+        const transformed = { ...item };
+
+        if (transformed.ActivityTypeTable) {
+          transformed.activity_table = transformed.ActivityTypeTable;
+          delete transformed.ActivityTypeTable;
+        }
+
+        if (transformed.UnitTable) {
+          transformed.unit_table = transformed.UnitTable;
+          delete transformed.UnitTable;
+        }
+        console.log(transformed);
+        return transformed as Consumption[];
+      });
+
+      return {
+        data: transformedData,
+        meta: {
+          total: count || 0,
+          page: options.page,
+          limit: options.limit,
+          totalPages: count ? Math.ceil(count / options.limit) : 0,
+        },
+      };
+    } catch (error) {
+      console.error('Error in getPaginatedData:', error);
+      throw error;
+    }
+  }
 }
