@@ -21,6 +21,11 @@ export const useConsumptionData = () => {
   const [totalItems, setTotalItems] = useState(0);
   const [totalPages, setTotalPages] = useState(1);
 
+  const setItemsPerPageWithReset = (newPerPage: number) => {
+    setCurrentPage(1);
+    setItemsPerPage(newPerPage);
+  };
+
   // Filtering
   const [dateFilter, setDateFilter] = useState<{
     from: string | null;
@@ -41,6 +46,7 @@ export const useConsumptionData = () => {
         activityType: activityFilter,
         ...params,
       });
+      console.log('API response:', result);
 
       if (result.data && result.meta) {
         setConsumptions(result.data);
@@ -68,6 +74,9 @@ export const useConsumptionData = () => {
 
       try {
         setIsLoading(true);
+        console.log(
+          `Richiesta pagina ${currentPage} con ${itemsPerPage} elementi per pagina`
+        );
 
         await fetchConsumptions({
           userId: userContext.userId,
@@ -163,7 +172,7 @@ export const useConsumptionData = () => {
     handleSort,
     renderSortIndicator,
     handlePageChange,
-    setItemsPerPage,
+    setItemsPerPage: setItemsPerPageWithReset,
     handleFilterChange,
     clearFilters,
     calculateTotalCO2,

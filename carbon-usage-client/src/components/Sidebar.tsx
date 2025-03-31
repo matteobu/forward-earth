@@ -11,7 +11,11 @@ import {
   TableProperties,
   Users,
 } from 'lucide-react';
-import { NavItem, NavItemOrDivider, SidebarProps } from '@/utils/interfaces';
+import {
+  NavItem,
+  NavItemOrDivider,
+  SidebarProps,
+} from '@/interfaces/interfaces';
 
 const Sidebar: React.FC<SidebarProps> = ({ className = '' }) => {
   const navigate = useNavigate();
@@ -19,19 +23,16 @@ const Sidebar: React.FC<SidebarProps> = ({ className = '' }) => {
 
   return (
     <aside
-      className={`bg-gray-50 h-auto w-full min-h-screen shadow-lg flex flex-col pt-6 ${className} rounded-2xl`}
+      className={`h-full  bg-gray-50 overflow-y-auto shadow-lg flex flex-col pt-6 ${className} rounded-2xl`}
     >
       {/* Logo and Brand */}
-      <div className="px-6 mb-8 flex items-center justify-between">
+      <div className="px-6 mb-8 flex items-center justify-center">
         <div className="flex items-center">
           <img
             src="/fe_logo.svg"
             alt="Forward Earth Logo"
-            className="h-7 w-auto"
+            className="h-7 w-60 object-contain"
           />
-          <span className="ml-2 text-lg font-semibold text-gray-800">
-            Forward Earth
-          </span>
         </div>
       </div>
 

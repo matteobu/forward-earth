@@ -21,25 +21,25 @@ import { Consumption } from './entities/consumption.entity';
 export class ConsumptionController {
   constructor(private readonly consumptionService: ConsumptionService) {}
 
-  @Get(':id') // Get all consumptions based on the user_id with optional pagination, sorting and filtering
+  @Get(':id')
   async getConsumptionInfo(
     @Param('id') user_id: number,
     @Query('page') page?: number,
     @Query('limit') limit?: number,
-    @Query('sortBy') sortBy = 'date',
-    @Query('sortOrder') sortOrder: 'ASC' | 'DESC' = 'DESC',
+    @Query('sortBy') sortBy?: string,
+    @Query('sortOrder') sortOrder?: 'ASC' | 'DESC',
     @Query('dateFrom') dateFrom?: string,
     @Query('dateTo') dateTo?: string,
     @Query('activityType') activityType?: number,
   ) {
     const hasAdvancedParams =
-      sortBy ||
-      sortOrder ||
-      dateFrom ||
-      dateTo ||
-      activityType ||
-      page ||
-      limit;
+      page !== undefined ||
+      limit !== undefined ||
+      sortBy !== undefined ||
+      sortOrder !== undefined ||
+      dateFrom !== undefined ||
+      dateTo !== undefined ||
+      activityType !== undefined;
 
     if (!hasAdvancedParams) {
       const consumption: Consumption[] =
@@ -47,16 +47,18 @@ export class ConsumptionController {
       return consumption;
     }
 
-    return this.consumptionService.getUserConsumptionPaginated({
+    const result = await this.consumptionService.getUserConsumptionPaginated({
       user_id,
       page: page || 1,
       limit: limit || 10,
-      sortBy,
-      sortOrder,
+      sortBy: sortBy || 'date',
+      sortOrder: sortOrder || 'DESC',
       dateFrom,
       dateTo,
       activityType: activityType ? +activityType : undefined,
     });
+
+    return result;
   }
 
   @Post('create')

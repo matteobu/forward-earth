@@ -31,4 +31,15 @@ export const ACTIVITY_TYPE_UNIT_MOCKED = [
   { activityType: 'Solar Panel Manufacturing', unit: 'unit' },
 ];
 
-
+export const CHART_COLORS = [
+  '#4F46E5', // primary blue
+  '#F97316', // orange
+  '#10B981', // green
+  '#F43F5E', // pink
+  '#F59E0B', // amber
+  '#8B5CF6', // purple
+  '#EC4899', // hot pink
+  '#06B6D4', // cyan
+  '#EF4444', // red
+  '#84CC16', // lime
+];

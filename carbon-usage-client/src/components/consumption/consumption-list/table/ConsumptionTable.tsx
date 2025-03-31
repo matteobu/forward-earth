@@ -1,8 +1,8 @@
-// ConsumptionTable.tsx
 import React, { JSX } from 'react';
 import { Consumption } from '@/utils/types';
 import ConsumptionTableHeader from './ConsumptionTableHeader';
 import ConsumptionTableRow from './ConsumptionTableRow';
+import FilterIcons from '../filters/FilterIcons';
 
 interface ConsumptionTableProps {
   consumptions: Consumption[];
@@ -13,6 +13,8 @@ interface ConsumptionTableProps {
     date: string;
   } | null;
   isSubmitting: boolean;
+  showFilters: boolean;
+  toggleFilters: () => void;
   handleSort: (field: string) => void;
   handleInputChange: (
     e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
@@ -30,7 +32,8 @@ const ConsumptionTable: React.FC<ConsumptionTableProps> = ({
   editingId,
   editForm,
   isSubmitting,
-
+  showFilters,
+  toggleFilters,
   handleSort,
   handleInputChange,
   handleSaveEdit,
@@ -41,30 +44,36 @@ const ConsumptionTable: React.FC<ConsumptionTableProps> = ({
   renderSortIndicator,
 }) => {
   return (
-    <div className="overflow-x-auto  border-gray-200 rounded-xl">
-      <table className="min-w-full bg-white border border-gray-200 rounded-xl">
-        <ConsumptionTableHeader
-          handleSort={handleSort}
-          renderSortIndicator={renderSortIndicator}
-        />
-        <tbody>
-          {consumptions.map((consumption) => (
-            <ConsumptionTableRow
-              key={consumption.id}
-              consumption={consumption}
-              isEditing={editingId === consumption.id}
-              editForm={editForm}
-              isSubmitting={isSubmitting}
-              handleInputChange={handleInputChange}
-              handleSaveEdit={handleSaveEdit}
-              handleCancelEdit={handleCancelEdit}
-              handleDelete={handleDelete}
-              handleEdit={handleEdit}
-              formatDate={formatDate}
-            />
-          ))}
-        </tbody>
-      </table>
+    <div className="bg-white rounded-xl shadow-lg p-6 mb-6">
+      <div className="flex justify-between items-center mb-6">
+        <h3 className="text-lg font-medium text-gray-800">Consumption Data</h3>
+        <FilterIcons showFilters={showFilters} toggleFilters={toggleFilters} />
+      </div>
+      <div className="overflow-x-auto">
+        <table className="min-w-full divide-y divide-gray-200">
+          <ConsumptionTableHeader
+            handleSort={handleSort}
+            renderSortIndicator={renderSortIndicator}
+          />
+          <tbody className="bg-white divide-y divide-gray-200">
+            {consumptions.map((consumption) => (
+              <ConsumptionTableRow
+                key={consumption.id}
+                consumption={consumption}
+                isEditing={editingId === consumption.id}
+                editForm={editForm}
+                isSubmitting={isSubmitting}
+                handleInputChange={handleInputChange}
+                handleSaveEdit={handleSaveEdit}
+                handleCancelEdit={handleCancelEdit}
+                handleDelete={handleDelete}
+                handleEdit={handleEdit}
+                formatDate={formatDate}
+              />
+            ))}
+          </tbody>
+        </table>
+      </div>
     </div>
   );
 };

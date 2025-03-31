@@ -1,4 +1,4 @@
-import { AuthContextType, User } from '@/utils/interfaces';
+import { AuthContextType, User } from '@/interfaces/interfaces';
 import { useUser } from './UserContext';
 import React, { createContext, useContext, useEffect, useState } from 'react';
 

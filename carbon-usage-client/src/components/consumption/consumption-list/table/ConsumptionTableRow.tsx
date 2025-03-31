@@ -1,8 +1,8 @@
-// ConsumptionRow.tsx
 import React, { useEffect, useState } from 'react';
 import { ActivityType, Consumption } from '@/utils/types';
 import { activityTypeService } from '@/services/activityTypeService';
 import { Ban, Pencil, Save, Trash2 } from 'lucide-react';
+import { formatNumber } from '@/utils/utils';
 
 interface ConsumptionRowProps {
   consumption: Consumption;
@@ -56,8 +56,8 @@ const ConsumptionTableRow: React.FC<ConsumptionRowProps> = ({
 
   if (isEditing) {
     return (
-      <tr className="hover:bg-gray-50">
-        <td className="py-3 px-4 border-b w-[25%]">
+      <tr key={consumption.activity_type_table_id} className="bg-indigo-50">
+        <td className="px-6 py-4 whitespace-nowrap">
           <select
             name="activity_type_table_id"
             value={editForm?.activity_type_table_id}
@@ -74,7 +74,7 @@ const ConsumptionTableRow: React.FC<ConsumptionRowProps> = ({
             ))}
           </select>
         </td>
-        <td className="py-3 px-4 border-b w-[15%]">
+        <td className="px-6 py-4 whitespace-nowrap">
           <div className="flex items-center">
             <input
               type="number"
@@ -88,7 +88,7 @@ const ConsumptionTableRow: React.FC<ConsumptionRowProps> = ({
             <span className="ml-2">{consumption.unit_table?.name || ''}</span>
           </div>
         </td>
-        <td className="py-3 px-4 border-b w-[15%]">
+        <td className="px-6 py-4 whitespace-nowrap">
           <input
             type="date"
             name="date"
@@ -97,13 +97,10 @@ const ConsumptionTableRow: React.FC<ConsumptionRowProps> = ({
             className="border rounded p-1 w-full"
           />
         </td>
-        <td className="py-3 px-4 border-b w-[20%]">
-          <span className="font-medium">
-            {consumption.co2_equivalent.toFixed(2)}
-          </span>{' '}
-          kg CO<sub>2</sub>e
+        <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+          <span className="font-medium"></span> kg CO<sub>2</sub>e
         </td>
-        <td className="py-3 px-4 border-b w-[25%]">
+        <td className="px-6 py-4 whitespace-nowrap">
           <div className="flex space-x-2">
             <button
               onClick={handleSaveEdit}
@@ -112,13 +109,13 @@ const ConsumptionTableRow: React.FC<ConsumptionRowProps> = ({
                 isSubmitting ? 'opacity-50 cursor-not-allowed' : ''
               }`}
             >
-              {isSubmitting ? 'Saving...' : <Save />}
+              {isSubmitting ? 'Saving...' : <Save size={16} />}
             </button>
             <button
               onClick={handleCancelEdit}
               className="text-gray-500 hover:text-gray-700"
             >
-              <Ban />
+              <Ban size={16} />
             </button>
           </div>
         </td>
@@ -127,24 +124,24 @@ const ConsumptionTableRow: React.FC<ConsumptionRowProps> = ({
   }
 
   return (
-    <tr className="hover:bg-gray-50">
-      <td className="py-3 px-4 border-b w-[25%]">
+    <tr className={consumption.id % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
+      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800">
         {consumption.activity_table ? consumption.activity_table.name : 'N/A'}
       </td>
-      <td className="py-3 px-4 border-b w-[15%]">
-        {consumption.amount}{' '}
+      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
+        {formatNumber(consumption.amount)}{' '}
         {consumption.unit_table ? consumption.unit_table.name : ''}
       </td>
-      <td className="py-3 px-4 border-b w-[15%]">
+      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
         {formatDate(consumption.date)}
       </td>
-      <td className="py-3 px-4 border-b w-[20%]">
+      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
         <span className="font-medium">
-          {consumption.co2_equivalent.toFixed(2)}
+          {formatNumber(consumption.co2_equivalent)}
         </span>{' '}
         kg CO<sub>2</sub>e
       </td>
-      <td className="py-3 px-4 border-b w-[25%]">
+      <td className="px-6 py-4 whitespace-nowrap">
         <div className="flex space-x-2">
           <button
             onClick={() => handleDelete(consumption.id)}
