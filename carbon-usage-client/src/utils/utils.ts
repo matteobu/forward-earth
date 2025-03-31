@@ -1,50 +1,4 @@
-import { ACTIVITY_TYPES } from './constants';
-import { Consumption, ConsumptionPatchPayload } from './types';
-
-/**
- * Compares original consumption data with edited data and returns only the changed fields
- * @param editFormData The edited consumption data
- * @param originalConsumption The original consumption data
- * @returns An object containing only the fields that have changed
- */
-export const getChangedConsumptionFields = (
-  editFormData: Consumption,
-  originalConsumption: Consumption
-): ConsumptionPatchPayload => {
-  const changedFields: ConsumptionPatchPayload = {};
-
-  if (editFormData.amount !== originalConsumption.amount) {
-    changedFields.amount = editFormData.amount;
-
-    if (
-      editFormData.activity_type_id === originalConsumption.activity_type_id
-    ) {
-      const activityType = ACTIVITY_TYPES.find(
-        (type) => type.id === editFormData.activity_type_id
-      );
-      if (activityType) {
-        changedFields.co2_equivalent = editFormData.amount * activityType.co2;
-      }
-    }
-  }
-
-  if (editFormData.activity_type_id !== originalConsumption.activity_type_id) {
-    changedFields.activity_type_id = editFormData.activity_type_id;
-
-    const activityType = ACTIVITY_TYPES.find(
-      (type) => type.id === editFormData.activity_type_id
-    );
-    if (activityType) {
-      changedFields.co2_equivalent = editFormData.amount * activityType.co2;
-    }
-  }
-
-  if (editFormData.date !== originalConsumption.date) {
-    changedFields.date = editFormData.date;
-  }
-
-  return changedFields;
-};
+import { Consumption } from './types';
 
 /**
  * Checks if there are any changes in the consumption data
@@ -66,4 +20,29 @@ export const findConsumptionById = (
   id: number | null
 ): Consumption | undefined => {
   return consumptions.find((c) => c.id === id);
+};
+
+/**
+ * Formats a date string into a human-readable format
+ * @param dateString - The ISO date string to format
+ * @returns Formatted date (e.g., "Jan 15, 2023")
+ */
+export const formatDate = (dateString: string): string => {
+  const date = new Date(dateString);
+  return date.toLocaleDateString('en-US', {
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric',
+  });
+};
+
+/**
+ * Calculates the total CO2 equivalent from a list of consumption records
+ * @param consumptions - Array of consumption records
+ * @returns Total CO2 equivalent in kg
+ */
+export const calculateTotalCO2 = (consumptions: Consumption[]): number => {
+  return consumptions.reduce((total, consumption) => {
+    return total + consumption.co2_equivalent;
+  }, 0);
 };
