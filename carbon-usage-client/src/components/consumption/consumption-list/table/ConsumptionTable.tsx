@@ -30,6 +30,7 @@ const ConsumptionTable: React.FC<ConsumptionTableProps> = ({
   editingId,
   editForm,
   isSubmitting,
+
   handleSort,
   handleInputChange,
   handleSaveEdit,
@@ -40,8 +41,8 @@ const ConsumptionTable: React.FC<ConsumptionTableProps> = ({
   renderSortIndicator,
 }) => {
   return (
-    <div className="overflow-x-auto">
-      <table className="min-w-full bg-white border border-gray-200 rounded-md">
+    <div className="overflow-x-auto  border-gray-200 rounded-xl">
+      <table className="min-w-full bg-white border border-gray-200 rounded-xl">
         <ConsumptionTableHeader
           handleSort={handleSort}
           renderSortIndicator={renderSortIndicator}

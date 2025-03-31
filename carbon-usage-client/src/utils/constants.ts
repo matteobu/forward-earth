@@ -30,3 +30,5 @@ export const ACTIVITY_TYPE_UNIT_MOCKED = [
   { activityType: 'Aluminum Production', unit: 'kg' },
   { activityType: 'Solar Panel Manufacturing', unit: 'unit' },
 ];
+
+
