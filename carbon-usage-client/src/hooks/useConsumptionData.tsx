@@ -214,6 +214,8 @@ export const useConsumptionData = () => {
     totalPages,
     dateFilter,
     activityFilter,
+    setIsLoading,
+    setError,
     fetchConsumptions,
     handleSort,
     renderSortIndicator,
