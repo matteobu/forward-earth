@@ -1,7 +1,8 @@
-// hooks/useConsumptionData.ts
+/* eslint-disable react-hooks/exhaustive-deps */
 import { useState, useEffect } from 'react';
 import { Consumption } from '@/utils/types';
 import { useUser } from '@/contexts/UserContext';
+import { consumptionService } from '@/services/consumptionService';
 
 export const useConsumptionData = () => {
   const [consumptions, setConsumptions] = useState<Consumption[]>([]);
@@ -26,84 +27,31 @@ export const useConsumptionData = () => {
   }>({ from: null, to: null });
   const [activityFilter, setActivityFilter] = useState<number | null>(null);
 
-  const fetchConsumptions = async (
-    params: {
-      userId?: number;
-      page?: number;
-      limit?: number;
-      sortBy?: string;
-      sortOrder?: 'asc' | 'desc';
-      dateFrom?: string | null;
-      dateTo?: string | null;
-      activityType?: number | null;
-    } = {}
-  ) => {
-    const {
-      userId,
-      page = currentPage,
-      limit = itemsPerPage,
-      sortBy = sortField,
-      sortOrder = sortDirection,
-      dateFrom = dateFilter.from,
-      dateTo = dateFilter.to,
-      activityType = activityFilter,
-    } = params;
-
-    let url = `http://localhost:3000/consumption/${userId}`;
-
-    const queryParams = new URLSearchParams();
-
-    if (page) queryParams.append('page', page.toString());
-    if (limit) queryParams.append('limit', limit.toString());
-    if (sortBy) queryParams.append('sortBy', sortBy);
-    if (sortOrder) queryParams.append('sortOrder', sortOrder.toUpperCase());
-    if (dateFrom) queryParams.append('dateFrom', dateFrom);
-    if (dateTo) queryParams.append('dateTo', dateTo);
-    if (activityType)
-      queryParams.append('activityType', activityType.toString());
-
-    const queryString = queryParams.toString();
-    if (queryString) {
-      url += `?${queryString}`;
-    }
-
+  const fetchConsumptions = async (params = {}) => {
     try {
-      const response = await fetch(url, {
-        credentials: 'include',
+      const result = await consumptionService.fetchConsumptions({
+        userId: userContext.userId,
+        page: currentPage,
+        limit: itemsPerPage,
+        sortBy: sortField,
+        sortOrder: sortDirection,
+        dateFrom: dateFilter.from,
+        dateTo: dateFilter.to,
+        activityType: activityFilter,
+        ...params,
       });
 
-      if (!response.ok) {
-        throw new Error(`Error: ${response.status}`);
-      }
-
-      const text = await response.text();
-      if (!text || text.trim() === '') {
-        setConsumptions([]);
-        setTotalItems(0);
+      if (result.data && result.meta) {
+        setConsumptions(result.data);
+        setTotalItems(result.meta.total);
+        setTotalPages(result.meta.totalPages);
+      } else {
+        setConsumptions(Array.isArray(result) ? result : []);
+        setTotalItems(Array.isArray(result) ? result.length : 0);
         setTotalPages(1);
-        return [];
       }
 
-      try {
-        const data = JSON.parse(text);
-        if (data.data && data.meta) {
-          setConsumptions(data.data);
-          setTotalItems(data.meta.total);
-          setTotalPages(data.meta.totalPages);
-        } else {
-          setConsumptions(Array.isArray(data) ? data : []);
-          setTotalItems(Array.isArray(data) ? data.length : 0);
-          setTotalPages(1);
-        }
-
-        return data;
-      } catch (e) {
-        console.error('Error parsing JSON:', text, e);
-        setConsumptions([]);
-        setTotalItems(0);
-        setTotalPages(1);
-        return [];
-      }
+      return result;
     } catch (error) {
       console.error('Error fetching consumptions:', error);
       throw error;

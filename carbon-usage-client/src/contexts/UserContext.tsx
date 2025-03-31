@@ -1,7 +1,7 @@
 import { User } from '@/utils/interfaces';
 import React, { createContext, useState, useContext, ReactNode } from 'react';
 
-interface UserContextType {
+export interface UserContextType {
   userContext: User;
   setUserContext: (user: User) => void;
 }
