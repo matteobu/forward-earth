@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 import { Consumption } from '@/utils/types';
 import { useUser } from '@/contexts/UserContext';
 import { consumptionService } from '@/services/consumptionService';
+import { calculateTotalCO2 } from '@/utils/utils';
 
 export const useConsumptionData = () => {
   const [consumptions, setConsumptions] = useState<Consumption[]>([]);
@@ -142,12 +143,6 @@ export const useConsumptionData = () => {
     setDateFilter({ from: null, to: null });
     setActivityFilter(null);
     setCurrentPage(1);
-  };
-
-  const calculateTotalCO2 = () => {
-    return consumptions.reduce((total, consumption) => {
-      return total + consumption.co2_equivalent;
-    }, 0);
   };
 
   return {

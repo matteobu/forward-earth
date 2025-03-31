@@ -7,6 +7,7 @@ import PaginationControls from './PaginationControls';
 import ConsumptionTable from './ConsumptionTable';
 import { useConsumptionData } from '@/hooks/useConsumptionData';
 import { useEditingState } from '@/hooks/useEditingState';
+import { formatDate } from '@/utils/utils';
 
 export default function ConsumptionList() {
   const navigate = useNavigate();
@@ -89,15 +90,6 @@ export default function ConsumptionList() {
     activityFilter,
   ]);
 
-  const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    return date.toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric',
-    });
-  };
-
   const toggleFilters = () => {
     setShowFilters(!showFilters);
   };
@@ -167,7 +159,7 @@ export default function ConsumptionList() {
               Total CO2 Impact
             </h3>
             <p className="text-2xl font-bold text-gray-800">
-              {calculateTotalCO2().toFixed(2)} kg CO<sub>2</sub>e
+              {calculateTotalCO2(consumptions).toFixed(2)} kg CO<sub>2</sub>e
             </p>
           </div>
 
