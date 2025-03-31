@@ -1,4 +1,4 @@
-// components/consumption/ConsumptionList.tsx
+/* eslint-disable react-hooks/exhaustive-deps */
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Consumption, ConsumptionPatchPayload } from '@/utils/types';
@@ -12,6 +12,7 @@ export default function ConsumptionList() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const { userContext } = useUser();
+
   // Edit States
   const [editingId, setEditingId] = useState<number | null>(null);
   const [editForm, setEditForm] = useState<{
@@ -23,12 +24,113 @@ export default function ConsumptionList() {
     {}
   );
   const [isSubmitting, setIsSubmitting] = useState(false);
+
   // Sorting
-  const [sortField, setSortField] = useState<string | null>(null);
-  const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('asc');
+  const [sortField, setSortField] = useState<string>('date');
+  const [sortDirection, setSortDirection] = useState<'asc' | 'desc'>('desc');
+
+  // Pagination
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(10);
+  const [totalItems, setTotalItems] = useState(0);
+  const [totalPages, setTotalPages] = useState(1);
+
+  // Filtering
+  const [dateFilter, setDateFilter] = useState<{
+    from: string | null;
+    to: string | null;
+  }>({ from: null, to: null });
+  const [activityFilter, setActivityFilter] = useState<number | null>(null);
+  const [showFilters, setShowFilters] = useState(false);
+
+  const fetchConsumptions = async (
+    params: {
+      userId?: number;
+      page?: number;
+      limit?: number;
+      sortBy?: string;
+      sortOrder?: 'asc' | 'desc';
+      dateFrom?: string | null;
+      dateTo?: string | null;
+      activityType?: number | null;
+    } = {}
+  ) => {
+    const {
+      userId,
+      page = currentPage,
+      limit = itemsPerPage,
+      sortBy = sortField,
+      sortOrder = sortDirection,
+      dateFrom = dateFilter.from,
+      dateTo = dateFilter.to,
+      activityType = activityFilter,
+    } = params;
+
+    let url = `http://localhost:3000/consumption/${userId}`;
+
+    const queryParams = new URLSearchParams();
+
+    if (page) queryParams.append('page', page.toString());
+    if (limit) queryParams.append('limit', limit.toString());
+    if (sortBy) queryParams.append('sortBy', sortBy);
+    if (sortOrder) queryParams.append('sortOrder', sortOrder.toUpperCase());
+    if (dateFrom) queryParams.append('dateFrom', dateFrom);
+    if (dateTo) queryParams.append('dateTo', dateTo);
+    if (activityType)
+      queryParams.append('activityType', activityType.toString());
+
+    const queryString = queryParams.toString();
+    if (queryString) {
+      url += `?${queryString}`;
+    }
+
+    try {
+      const response = await fetch(url, {
+        credentials: 'include',
+      });
+
+      if (!response.ok) {
+        throw new Error(`Error: ${response.status}`);
+      }
+
+      const text = await response.text();
+      if (!text || text.trim() === '') {
+        setConsumptions([]);
+        setTotalItems(0);
+        setTotalPages(1);
+        return [];
+      }
+
+      try {
+        const data = JSON.parse(text);
+        console.log(data);
+        if (data.data && data.meta) {
+          setConsumptions(data.data);
+          setTotalItems(data.meta.total);
+          setTotalPages(data.meta.totalPages);
+        } else {
+          setConsumptions(Array.isArray(data) ? data : []);
+
+          setTotalItems(Array.isArray(data) ? data.length : 0);
+          setTotalPages(1);
+        }
+
+        return data;
+      } catch (e) {
+        console.error('Error parsing JSON:', text, e);
+        setConsumptions([]);
+        setTotalItems(0);
+        setTotalPages(1);
+        return [];
+      }
+    } catch (error) {
+      console.error('Error fetching consumptions:', error);
+      throw error;
+    }
+  };
 
   useEffect(() => {
-    const fetchConsumptions = async () => {
+    const loadConsumptions = async () => {
       if (!userContext || !userContext.userId) {
         setIsLoading(false);
         return;
@@ -37,26 +139,16 @@ export default function ConsumptionList() {
       try {
         setIsLoading(true);
 
-        const consumptionsResponse = await fetch(
-          `http://localhost:3000/consumption/${userContext.userId}`,
-          {
-            credentials: 'include',
-          }
-        );
-
-        if (!consumptionsResponse.ok) {
-          throw new Error(`Error: ${consumptionsResponse.status}`);
-        }
-
-        const responseJson = await consumptionsResponse.json();
-
-        const consumptionsData: Consumption[] = Array.isArray(responseJson.data)
-          ? responseJson.data
-          : Array.isArray(responseJson)
-          ? responseJson
-          : [];
-
-        setConsumptions(consumptionsData);
+        await fetchConsumptions({
+          userId: userContext.userId,
+          page: currentPage,
+          limit: itemsPerPage,
+          sortBy: sortField,
+          sortOrder: sortDirection,
+          dateFrom: dateFilter.from,
+          dateTo: dateFilter.to,
+          activityType: activityFilter,
+        });
       } catch (err) {
         console.error('Failed to fetch consumptions', err);
         setError(err instanceof Error ? err.message : 'Unknown error occurred');
@@ -65,8 +157,17 @@ export default function ConsumptionList() {
       }
     };
 
-    fetchConsumptions();
-  }, [userContext]);
+    loadConsumptions();
+  }, [
+    userContext,
+    currentPage,
+    itemsPerPage,
+    sortField,
+    sortDirection,
+    dateFilter.from,
+    dateFilter.to,
+    activityFilter,
+  ]);
 
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
@@ -95,7 +196,11 @@ export default function ConsumptionList() {
         throw new Error(`Error: ${response.status}`);
       }
 
-      setConsumptions((prev) => prev.filter((c) => c.id !== id));
+      if (userContext && userContext.userId) {
+        await fetchConsumptions({
+          userId: userContext.userId,
+        });
+      }
     } catch (err) {
       console.error('Failed to delete consumption', err);
       alert('Failed to delete consumption');
@@ -198,42 +303,9 @@ export default function ConsumptionList() {
       }
 
       if (userContext && userContext.userId) {
-        const refreshResponse = await fetch(
-          `http://localhost:3000/consumption/${userContext.userId}`,
-          {
-            credentials: 'include',
-          }
-        );
-
-        if (!refreshResponse.ok) {
-          throw new Error(`Error refreshing data: ${refreshResponse.status}`);
-        }
-
-        const refreshData = await refreshResponse.json();
-
-        let consumptionsData = Array.isArray(refreshData.data)
-          ? refreshData.data
-          : Array.isArray(refreshData)
-          ? refreshData
-          : [];
-
-        consumptionsData = consumptionsData.map((consumption: Consumption) => {
-          if (
-            consumption.amount &&
-            consumption.activity_table &&
-            consumption.activity_table.emission_factor
-          ) {
-            const co2_equivalent: number =
-              consumption.amount * consumption.activity_table.emission_factor;
-            return {
-              ...consumption,
-              co2_equivalent: co2_equivalent,
-            } as Consumption;
-          }
-          return consumption as Consumption;
+        await fetchConsumptions({
+          userId: userContext.userId,
         });
-
-        setConsumptions(consumptionsData);
       }
 
       handleCancelEdit();
@@ -252,20 +324,6 @@ export default function ConsumptionList() {
       setSortField(field);
       setSortDirection('asc');
     }
-
-    fetchSortedData(field, sortDirection);
-  };
-
-  const fetchSortedData = async (field: string, direction: 'asc' | 'desc') => {
-    setIsLoading(true);
-    try {
-      console.log('received sorting info:', field, direction);
-    } catch (err) {
-      console.error('Error fetching sorted data:', err);
-      setError(err instanceof Error ? err.message : 'Unknown error occurred');
-    } finally {
-      setIsLoading(false);
-    }
   };
 
   const renderSortIndicator = (field: string) => {
@@ -277,6 +335,36 @@ export default function ConsumptionList() {
     ) : (
       <span className="text-blue-500 ml-1">↓</span>
     );
+  };
+
+  const handlePageChange = (page: number) => {
+    if (page >= 1 && page <= totalPages) {
+      setCurrentPage(page);
+    }
+  };
+
+  const handleFilterChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>
+  ) => {
+    const { name, value } = e.target;
+
+    if (name === 'dateFrom') {
+      setDateFilter((prev) => ({ ...prev, from: value || null }));
+    } else if (name === 'dateTo') {
+      setDateFilter((prev) => ({ ...prev, to: value || null }));
+    } else if (name === 'activityType') {
+      setActivityFilter(value ? parseInt(value, 10) : null);
+    }
+  };
+
+  const clearFilters = () => {
+    setDateFilter({ from: null, to: null });
+    setActivityFilter(null);
+    setCurrentPage(1);
+  };
+
+  const toggleFilters = () => {
+    setShowFilters(!showFilters);
   };
 
   if (isLoading) {
@@ -300,13 +388,82 @@ export default function ConsumptionList() {
     <div>
       <div className="flex justify-between items-center mb-6">
         <h2 className="text-2xl font-bold">Your Consumptions</h2>
-        <button
-          onClick={() => navigate('/dashboard/consumptions/new')}
-          className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
-        >
-          Add New
-        </button>
+        <div className="flex space-x-2">
+          <button
+            onClick={toggleFilters}
+            className="px-4 py-2 bg-gray-200 text-gray-800 rounded hover:bg-gray-300"
+          >
+            {showFilters ? 'Hide Filters' : 'Show Filters'}
+          </button>
+          <button
+            onClick={() => navigate('/dashboard/consumptions/new')}
+            className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+          >
+            Add New
+          </button>
+        </div>
       </div>
+
+      {showFilters && (
+        <div className="mb-6 p-4 bg-gray-50 border border-gray-200 rounded-md">
+          <h3 className="text-lg font-medium text-gray-700 mb-3">Filters</h3>
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                From Date
+              </label>
+              <input
+                type="date"
+                name="dateFrom"
+                value={dateFilter.from || ''}
+                onChange={handleFilterChange}
+                className="border rounded p-2 w-full"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                To Date
+              </label>
+              <input
+                type="date"
+                name="dateTo"
+                value={dateFilter.to || ''}
+                onChange={handleFilterChange}
+                className="border rounded p-2 w-full"
+              />
+            </div>
+            <div>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Activity Type
+              </label>
+              <select
+                name="activityType"
+                value={activityFilter || ''}
+                onChange={handleFilterChange}
+                className="border rounded p-2 w-full"
+              >
+                <option value="">All Activities</option>
+                {ACTIVITY_TYPES.map((activity) => (
+                  <option
+                    key={activity.activity_type_id}
+                    value={activity.activity_type_id}
+                  >
+                    {activity.name}
+                  </option>
+                ))}
+              </select>
+            </div>
+          </div>
+          <div className="mt-4 flex justify-end">
+            <button
+              onClick={clearFilters}
+              className="px-4 py-2 bg-gray-200 text-gray-800 rounded hover:bg-gray-300 mr-2"
+            >
+              Clear Filters
+            </button>
+          </div>
+        </div>
+      )}
 
       {!consumptions || consumptions.length === 0 ? (
         <div className="bg-gray-50 border border-gray-200 rounded-md p-8 text-center">
@@ -374,7 +531,7 @@ export default function ConsumptionList() {
                             name="activity_type_table_id"
                             value={editForm?.activity_type_table_id}
                             onChange={handleInputChange}
-                            className="border rounded p-1 max-w-[200px]"
+                            className="border rounded p-1 w-full"
                           >
                             {ACTIVITY_TYPES.map((activity) => (
                               <option
@@ -411,13 +568,13 @@ export default function ConsumptionList() {
                             className="border rounded p-1 w-full"
                           />
                         </td>
-                        <td className="py-3 px-4 border-b">
+                        <td className="py-3 px-4 border-b w-[20%]">
                           <span className="font-medium">
                             {consumption.co2_equivalent.toFixed(2)}
                           </span>{' '}
                           kg CO<sub>2</sub>e
                         </td>
-                        <td className="py-3 px-4 border-b">
+                        <td className="py-3 px-4 border-b w-[25%]">
                           <div className="flex space-x-2">
                             <button
                               onClick={handleSaveEdit}
@@ -441,27 +598,27 @@ export default function ConsumptionList() {
                       </>
                     ) : (
                       <>
-                        <td className="py-3 px-4 border-b">
+                        <td className="py-3 px-4 border-b w-[25%]">
                           {consumption.activity_table
                             ? consumption.activity_table.name
                             : 'N/A'}
                         </td>
-                        <td className="py-3 px-4 border-b">
+                        <td className="py-3 px-4 border-b w-[15%]">
                           {consumption.amount}{' '}
                           {consumption.unit_table
                             ? consumption.unit_table.name
                             : ''}
                         </td>
-                        <td className="py-3 px-4 border-b">
+                        <td className="py-3 px-4 border-b w-[15%]">
                           {formatDate(consumption.date)}
                         </td>
-                        <td className="py-3 px-4 border-b">
+                        <td className="py-3 px-4 border-b w-[20%]">
                           <span className="font-medium">
                             {consumption.co2_equivalent.toFixed(2)}
                           </span>{' '}
                           kg CO<sub>2</sub>e
                         </td>
-                        <td className="py-3 px-4 border-b">
+                        <td className="py-3 px-4 border-b w-[25%]">
                           <div className="flex space-x-2">
                             <button
                               onClick={() => handleDelete(consumption.id)}
@@ -483,6 +640,77 @@ export default function ConsumptionList() {
                 ))}
               </tbody>
             </table>
+          </div>
+
+          {/* Pagination Controls */}
+          <div className="mt-6 flex justify-between items-center">
+            <div className="flex items-center space-x-2">
+              <span className="text-sm text-gray-700">
+                Showing {consumptions.length} of {totalItems} items
+              </span>
+              <select
+                value={itemsPerPage}
+                onChange={(e) => setItemsPerPage(Number(e.target.value))}
+                className="border rounded p-1 ml-2"
+              >
+                <option value="5">5 per page</option>
+                <option value="10">10 per page</option>
+                <option value="20">20 per page</option>
+                <option value="50">50 per page</option>
+              </select>
+            </div>
+            <div className="flex items-center space-x-1">
+              <button
+                onClick={() => handlePageChange(1)}
+                disabled={currentPage === 1}
+                className={`px-3 py-1 rounded ${
+                  currentPage === 1
+                    ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                    : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                }`}
+              >
+                &laquo;
+              </button>
+              <button
+                onClick={() => handlePageChange(currentPage - 1)}
+                disabled={currentPage === 1}
+                className={`px-3 py-1 rounded ${
+                  currentPage === 1
+                    ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                    : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                }`}
+              >
+                &lsaquo;
+              </button>
+
+              {/* Current Page Display */}
+              <span className="px-3 py-1 bg-blue-500 text-white rounded">
+                {currentPage}
+              </span>
+
+              <button
+                onClick={() => handlePageChange(currentPage + 1)}
+                disabled={currentPage === totalPages}
+                className={`px-3 py-1 rounded ${
+                  currentPage === totalPages
+                    ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                    : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                }`}
+              >
+                &rsaquo;
+              </button>
+              <button
+                onClick={() => handlePageChange(totalPages)}
+                disabled={currentPage === totalPages}
+                className={`px-3 py-1 rounded ${
+                  currentPage === totalPages
+                    ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                    : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                }`}
+              >
+                &raquo;
+              </button>
+            </div>
           </div>
         </>
       )}
