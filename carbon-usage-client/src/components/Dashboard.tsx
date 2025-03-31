@@ -38,6 +38,10 @@ export default function Dashboard() {
               <Route path="consumptions/list" element={<ConsumptionList />} />
               <Route path="consumptions/new" element={<ConsumptionForm />} />
               <Route
+                path="consumptions/data-collection"
+                element={<ConsumptionList />}
+              />
+              <Route
                 path="consumptions/:id/edit"
                 element={<ConsumptionForm />}
               />
