@@ -7,6 +7,7 @@ import { ActivityTypesModule } from './activity-types/activity-types.module';
 import { UnitsModule } from './units/units.module';
 import { AuthModule } from './auth/auth.module';
 import { CompaniesModule } from './companies/companies.module';
+import { ProductsModule } from './products/products.module';
 
 @Module({
   imports: [
@@ -16,6 +17,7 @@ import { CompaniesModule } from './companies/companies.module';
     UnitsModule,
     AuthModule,
     CompaniesModule,
+    ProductsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

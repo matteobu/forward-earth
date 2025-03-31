@@ -456,6 +456,9 @@ export class SupabaseService {
     }
   }
 
+  // ***
+  // COMPANY ROUTE
+  // ***
   async getCompanyData(userId: number) {
     const { data: companyData, error: companyError } = await this.supabase
       .from('CompanyTable')
@@ -465,7 +468,26 @@ export class SupabaseService {
     if (companyError) {
       throw new Error(`Error deleting consumption: ${companyError.message}`);
     }
+
+    // FIXME:
     // eslint-disable-next-line @typescript-eslint/no-unsafe-return
     return companyData;
+  }
+
+  // ***
+  // PRODUCTS ROUTE
+  // ***
+  async getProductsData() {
+    const { data: productsData, error: productsError } = await this.supabase
+      .from('ProductTable')
+      .select('*');
+
+    if (productsError) {
+      throw new Error(`Error deleting consumption: ${productsError.message}`);
+    }
+
+    // FIXME:
+    // eslint-disable-next-line @typescript-eslint/no-unsafe-return
+    return productsData;
   }
 }

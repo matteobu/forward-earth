@@ -95,7 +95,7 @@ export const NAV_ITEMS: NavItemOrDivider[] = [
   },
   {
     title: 'Dashboard',
-    icon: <LayoutDashboard size={20} className="text-indigo-600" />,
+    icon: <LayoutDashboard size={20} className="text-gray-600" />,
     path: '/dashboard',
   },
   {
@@ -104,7 +104,7 @@ export const NAV_ITEMS: NavItemOrDivider[] = [
   },
   {
     title: 'Insert Consumption',
-    icon: <SquarePlus size={20} className="text-indigo-600" />,
+    icon: <SquarePlus size={20} className="text-gray-600" />,
     path: '/dashboard/consumptions/new',
   },
   {
@@ -123,7 +123,7 @@ export const NAV_ITEMS: NavItemOrDivider[] = [
   },
   {
     title: 'PCF assessment',
-    icon: <FileText size={20} className="text-gray-500" />,
+    icon: <FileText size={20} className="text-red-500" />,
     path: '/pcf-assessment',
   },
   {
@@ -137,7 +137,7 @@ export const NAV_ITEMS: NavItemOrDivider[] = [
   },
   {
     title: 'Users',
-    icon: <Users size={20} className="text-gray-500" />,
+    icon: <Users size={20} className="text-red-500" />,
     path: '/users',
   },
 ];
