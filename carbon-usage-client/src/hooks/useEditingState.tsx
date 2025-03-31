@@ -1,9 +1,10 @@
 import { useState } from 'react';
 
 import { Consumption, ConsumptionPatchPayload } from '@/utils/types';
-import { ACTIVITY_TYPES } from '@/utils/constants';
+
 import { User } from '@/utils/interfaces';
 import { consumptionService } from '@/services/consumptionService';
+import { useActivityTypeContext } from '@/contexts/ActivityTypeContext';
 
 interface EditForm {
   activity_type_table_id: number;
@@ -15,6 +16,8 @@ export const useEditingState = (
   fetchConsumptions: (params?: { userId: number }) => Promise<void>,
   userContext: User
 ) => {
+  const { activityTypes } = useActivityTypeContext();
+
   const [editingId, setEditingId] = useState<number | null>(null);
   const [editForm, setEditForm] = useState<EditForm | null>(null);
   const [changedFields, setChangedFields] = useState<ConsumptionPatchPayload>(
@@ -23,7 +26,7 @@ export const useEditingState = (
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleEdit = (consumption: Consumption) => {
-    const matchingActivity = ACTIVITY_TYPES.find(
+    const matchingActivity = activityTypes.find(
       (activity) => activity.name === consumption.activity_table.name
     );
 
@@ -58,7 +61,7 @@ export const useEditingState = (
     if (name === 'activity_type_table_id') {
       updatedForm.activity_type_table_id = parseInt(value, 10);
 
-      const selectedActivity = ACTIVITY_TYPES.find(
+      const selectedActivity = activityTypes.find(
         (activity) => activity.activity_type_id === parseInt(value, 10)
       );
 

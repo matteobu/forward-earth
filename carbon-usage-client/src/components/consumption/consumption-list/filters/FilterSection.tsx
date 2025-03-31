@@ -1,6 +1,6 @@
 // FilterSection.tsx
+import { useActivityTypeContext } from '@/contexts/ActivityTypeContext';
 import React from 'react';
-import { ACTIVITY_TYPES } from '@/utils/constants';
 
 interface FilterSectionProps {
   dateFilter: {
@@ -20,6 +20,8 @@ const FilterSection: React.FC<FilterSectionProps> = ({
   handleFilterChange,
   clearFilters,
 }) => {
+  const { activityTypes } = useActivityTypeContext();
+
   return (
     <div className="mb-6 p-4 bg-gray-50 border border-gray-200 rounded-md">
       <h3 className="text-lg font-medium text-gray-700 mb-3">Filters</h3>
@@ -59,7 +61,7 @@ const FilterSection: React.FC<FilterSectionProps> = ({
             className="border rounded p-2 w-full"
           >
             <option value="">All Activities</option>
-            {ACTIVITY_TYPES.map((activity) => (
+            {activityTypes.map((activity) => (
               <option
                 key={activity.activity_type_id}
                 value={activity.activity_type_id}
