@@ -1,6 +1,5 @@
-/* eslint-disable react-hooks/exhaustive-deps */
 // React and core libraries
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 // Contexts
 import { useUser } from '@/contexts/UserContext';
 // Custom hooks
@@ -18,23 +17,18 @@ import EmptyState from './display/EmptyState';
 import TotalCO2Impact from './display/TotalCO2Impact';
 import LoadingSpinner from './display/LoadingSpinner';
 import ErrorMessage from './display/ErrorMessage';
-import FilterIcons from './filters/FilterIcons';
 
 export default function ConsumptionList() {
   const {
     consumptions,
     isLoading,
     error,
-    sortField,
-    sortDirection,
     currentPage,
     itemsPerPage,
     totalItems,
     totalPages,
     dateFilter,
     activityFilter,
-    setIsLoading,
-    setError,
     fetchConsumptions,
     handleSort,
     renderSortIndicator,
@@ -60,46 +54,6 @@ export default function ConsumptionList() {
   // Sorting
   const [showFilters, setShowFilters] = useState(false);
 
-  useEffect(() => {
-    const loadConsumptions = async () => {
-      if (!userContext || !userContext.userId) {
-        setIsLoading(false);
-        return;
-      }
-
-      try {
-        setIsLoading(true);
-
-        await fetchConsumptions({
-          userId: userContext.userId,
-          page: currentPage,
-          limit: itemsPerPage,
-          sortBy: sortField,
-          sortOrder: sortDirection,
-          dateFrom: dateFilter.from,
-          dateTo: dateFilter.to,
-          activityType: activityFilter,
-        });
-      } catch (err) {
-        console.error('Failed to fetch consumptions', err);
-        setError(err instanceof Error ? err.message : 'Unknown error occurred');
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    loadConsumptions();
-  }, [
-    userContext,
-    currentPage,
-    itemsPerPage,
-    sortField,
-    sortDirection,
-    dateFilter.from,
-    dateFilter.to,
-    activityFilter,
-  ]);
-
   const toggleFilters = () => {
     setShowFilters(!showFilters);
   };
@@ -113,17 +67,12 @@ export default function ConsumptionList() {
 
   return (
     <div>
-      <ConsumptionHeader />
-
       {!consumptions || consumptions.length === 0 ? (
         <EmptyState />
       ) : (
         <>
           <TotalCO2Impact totalCO2={calculateTotalCO2(consumptions)} />
-          <FilterIcons
-            showFilters={showFilters}
-            toggleFilters={toggleFilters}
-          />
+          <ConsumptionHeader />
 
           {/* Filters */}
           {showFilters && (
@@ -140,6 +89,8 @@ export default function ConsumptionList() {
             editingId={editingId}
             editForm={editForm}
             isSubmitting={isSubmitting}
+            showFilters={showFilters}
+            toggleFilters={toggleFilters}
             handleSort={handleSort}
             handleInputChange={handleInputChange}
             handleSaveEdit={handleSaveEdit}

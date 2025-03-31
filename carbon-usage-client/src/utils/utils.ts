@@ -46,3 +46,9 @@ export const calculateTotalCO2 = (consumptions: Consumption[]): number => {
     return total + consumption.co2_equivalent;
   }, 0);
 };
+
+export const formatNumber = (num: number) => {
+  const numStr = num.toFixed(1);
+  const [intPart, decPart] = numStr.split('.');
+  return `${intPart.replace(/\B(?=(\d{3})+(?!\d))/g, '.')},${decPart}`;
+};

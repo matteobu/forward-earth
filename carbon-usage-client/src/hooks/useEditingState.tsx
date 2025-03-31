@@ -2,7 +2,7 @@ import { useState } from 'react';
 
 import { Consumption, ConsumptionPatchPayload } from '@/utils/types';
 
-import { User } from '@/utils/interfaces';
+import { User } from '@/interfaces/interfaces';
 import { consumptionService } from '@/services/consumptionService';
 import { useActivityTypeContext } from '@/contexts/ActivityTypeContext';
 

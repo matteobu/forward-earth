@@ -371,8 +371,11 @@ export class SupabaseService {
         extraQuery,
       } = options;
 
-      const from = (page - 1) * limit;
-      const to = from + limit - 1;
+      const pageNum = parseInt(String(page), 10);
+      const limitNum = parseInt(String(limit), 10);
+
+      const from = (pageNum - 1) * limitNum;
+      const to = from + limitNum - 1;
 
       let query = this.supabase.from(table).select(select, { count: 'exact' });
 
@@ -419,16 +422,16 @@ export class SupabaseService {
           delete transformed.UnitTable;
         }
 
-        return transformed as Consumption[];
+        return transformed as Consumption;
       });
 
       return {
         data: transformedData,
         meta: {
           total: count || 0,
-          page: options.page,
-          limit: options.limit,
-          totalPages: count ? Math.ceil(count / options.limit) : 0,
+          page: pageNum,
+          limit: limitNum,
+          totalPages: count ? Math.ceil(count / limitNum) : 0,
         },
       };
     } catch (error) {
