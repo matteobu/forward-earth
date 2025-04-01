@@ -9,6 +9,7 @@ export const useConsumptionData = () => {
   const [consumptions, setConsumptions] = useState<Consumption[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [dataChecked, setDataChecked] = useState(false);
   const { userContext } = useUser();
 
   // Sorting
@@ -68,6 +69,8 @@ export const useConsumptionData = () => {
     const loadConsumptions = async () => {
       if (!userContext || !userContext.userId) {
         setIsLoading(false);
+        setDataChecked(true);
+
         return;
       }
 
@@ -84,9 +87,11 @@ export const useConsumptionData = () => {
           dateTo: dateFilter.to,
           activityType: activityFilter,
         });
+        setDataChecked(true);
       } catch (err) {
         console.error('Failed to fetch consumptions', err);
         setError(err instanceof Error ? err.message : 'Unknown error occurred');
+        setDataChecked(true);
       } finally {
         setIsLoading(false);
       }
@@ -162,6 +167,7 @@ export const useConsumptionData = () => {
     totalPages,
     dateFilter,
     activityFilter,
+    dataChecked,
     setIsLoading,
     setError,
     fetchConsumptions,

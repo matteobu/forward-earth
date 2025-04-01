@@ -7,9 +7,10 @@ import DataQualityScoreCard from './DataQualityScoreCard';
 import CategoryBreakdown from './CategoryBreakdown';
 import MonthlyTrend from './MonthlyTrend';
 import HighImpactActivitiesTable from './HighImpactActivitiesTable';
+import { useNavigate } from 'react-router-dom';
 
 const MainPage = () => {
-  const { consumptions } = useConsumptionData();
+  const { consumptions, dataChecked, isLoading } = useConsumptionData();
   const [dataQuality, setDataQuality] = useState<'Good' | 'Fair' | 'Poor'>(
     'Good'
   );
@@ -23,6 +24,7 @@ const MainPage = () => {
   const [highImpactActivities, setHighImpactActivities] = useState<
     Consumption[]
   >([]);
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (!consumptions || consumptions.length === 0) return;
@@ -116,7 +118,24 @@ const MainPage = () => {
     }
   }, [consumptions]);
 
-  if (!consumptions || consumptions.length === 0) {
+  useEffect(() => {
+    let timeoutId: NodeJS.Timeout;
+
+    if (dataChecked && consumptions.length === 0) {
+      timeoutId = setTimeout(() => {
+        navigate('/add-consumption');
+      }, 5000);
+    }
+
+    return () => {
+      if (timeoutId) clearTimeout(timeoutId);
+    };
+  }, [dataChecked, consumptions, navigate]);
+
+  const topEmissionCategory =
+    categoryData.length > 0 ? categoryData[0] : { name: 'N/A', percentage: 0 };
+
+  if (isLoading) {
     return (
       <div className="flex items-center justify-center h-screen">
         <div className="text-center">
@@ -127,8 +146,42 @@ const MainPage = () => {
     );
   }
 
-  const topEmissionCategory =
-    categoryData.length > 0 ? categoryData[0] : { name: 'N/A', percentage: 0 };
+  if (!consumptions || consumptions.length === 0) {
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <div className="text-center">
+          <div className="mb-6">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              className="h-24 w-24 mx-auto text-gray-400"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"
+              />
+            </svg>
+          </div>
+          <h2 className="text-2xl font-bold text-gray-800 mb-4">
+            No Carbon Data Available
+          </h2>
+          <p className="text-gray-600 mb-6">
+            It looks like you haven't added any carbon consumption entries yet.
+          </p>
+          <button
+            onClick={() => navigate('/dashboard/consumptions/new')}
+            className="bg-blue-500 text-white px-6 py-3 rounded-lg hover:bg-blue-600 transition-colors"
+          >
+            Add First Entry
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="bg-gray-50 min-h-screen p-6">
