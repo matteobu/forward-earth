@@ -1,31 +1,56 @@
 const EmissionTypeCard = ({
-  title,
-  percentage,
+  topTwoEmissionCategory,
   color,
   icon,
 }: EmissionTypeCardProps) => (
-  <div className="relative bg-white rounded-xl shadow-md p-6 mb-4">
-    <div className="flex items-center space-x-4">
-      <div
-        className={`flex items-center justify-center w-10 h-10 rounded-full bg-${color}-100`}
-      >
-        <span className={`text-${color}-600 text-xl`}>{icon}</span>
+  <div className="relative bg-white rounded-xl shadow-lg p-6 border border-gray-100">
+    <div className="flex items-center justify-between">
+      <div className="flex items-center space-x-4">
+        <div
+          className={`flex items-center justify-center w-12 h-12 rounded-full bg-${color}-100`}
+        >
+          <span className={`text-${color}-600 text-xl`}>{icon}</span>
+        </div>
+        <div>
+          <h3 className="text-lg font-medium text-gray-700 mb-1">
+            {topTwoEmissionCategory[0].name}
+          </h3>
+          <p className="text-3xl font-bold text-gray-900">
+            {topTwoEmissionCategory[0].percentage}%
+          </p>
+        </div>
       </div>
+
+      <div className="h-12 w-px bg-gray-200 mx-4"></div>
+
       <div>
-        <h3 className="text-lg font-medium text-gray-800">{title}</h3>
-        <p className="text-3xl font-bold text-gray-900">{percentage}%</p>
+        <h3 className="text-lg font-medium text-gray-700 mb-1">
+          {topTwoEmissionCategory[1].name}
+        </h3>
+        <p className="text-3xl font-bold text-gray-900">
+          {topTwoEmissionCategory[1].percentage}%
+        </p>
       </div>
     </div>
+
     <div
-      className={`absolute w-1 h-full bg-${color}-500 top-0 right-0 rounded-r-lg`}
+      className={`absolute w-2 h-full bg-${color}-500 top-0 right-0 rounded-r-lg`}
     ></div>
   </div>
 );
 export default EmissionTypeCard;
 
 interface EmissionTypeCardProps {
-  title: string;
-  percentage: number;
+  topTwoEmissionCategory:
+    | {
+        name: string;
+        value: number;
+        percentage: number;
+      }[]
+    | {
+        name: string;
+        percentage: number;
+      }[];
   color: string;
   icon: string;
 }

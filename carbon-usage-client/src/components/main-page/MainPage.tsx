@@ -57,7 +57,6 @@ const MainPage = () => {
       });
     });
 
-    // Add 'Other' category for any activities not explicitly categorized
     let categorizedEmissions = 0;
     Object.values(emissionsByCategory).forEach((value) => {
       categorizedEmissions += value;
@@ -78,7 +77,6 @@ const MainPage = () => {
 
     setCategoryData(categoryChartData);
 
-    // Prepare monthly summary data
     const monthlyData: Record<string, { name: string; emissions: number }> = {};
     consumptions.forEach((item) => {
       const date = new Date(item.date);
@@ -132,8 +130,13 @@ const MainPage = () => {
     };
   }, [dataChecked, consumptions, navigate]);
 
-  const topEmissionCategory =
-    categoryData.length > 0 ? categoryData[0] : { name: 'N/A', percentage: 0 };
+  const topTwoEmissionCategory =
+    categoryData.length > 0
+      ? [categoryData[0], categoryData[1]]
+      : [
+          { name: 'N/A', percentage: 0 },
+          { name: 'N/A', percentage: 0 },
+        ];
 
   if (isLoading) {
     return (
@@ -200,8 +203,7 @@ const MainPage = () => {
         <TotalCO2Impact totalCO2={totalEmissions} />
         <DataQualityScoreCard dataQuality={dataQuality} />
         <EmissionTypeCard
-          title={topEmissionCategory.name}
-          percentage={topEmissionCategory.percentage}
+          topTwoEmissionCategory={topTwoEmissionCategory}
           color="indigo"
           icon="⚡"
         />
