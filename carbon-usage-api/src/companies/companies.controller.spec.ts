@@ -4,11 +4,21 @@ import { CompaniesService } from './companies.service';
 
 describe('CompaniesController', () => {
   let controller: CompaniesController;
+  let mockCompaniesService: Partial<CompaniesService>;
 
   beforeEach(async () => {
+    mockCompaniesService = {
+      findOne: jest.fn(),
+    };
+
     const module: TestingModule = await Test.createTestingModule({
       controllers: [CompaniesController],
-      providers: [CompaniesService],
+      providers: [
+        {
+          provide: CompaniesService,
+          useValue: mockCompaniesService,
+        },
+      ],
     }).compile();
 
     controller = module.get<CompaniesController>(CompaniesController);

@@ -1,3 +1,4 @@
+/* eslint-disable react-refresh/only-export-components */
 /* eslint-disable react-hooks/exhaustive-deps */
 // components/consumption/ConsumptionForm.tsx
 import React, { useState, useEffect } from 'react';
@@ -306,6 +307,10 @@ export default function ConsumptionForm() {
                 You would need to plant {Math.ceil(co2Impact / 25)} trees to
                 offset this impact.
               </p>
+              <p className="text-sm mt-1 opacity-80">
+                Offset by switching to a plant-based diet for{' '}
+                {calculateDietImpactOffset(co2Impact)}
+              </p>
             </div>
           </div>
         )}
@@ -336,3 +341,31 @@ export default function ConsumptionForm() {
     </div>
   );
 }
+
+export const calculateDietImpactOffset = (co2Amount: number): string => {
+  const dailyMeatDietEmissions = 7.2;
+  const dailyPlantBasedDietEmissions = 3.8;
+
+  const dailyReduction = dailyMeatDietEmissions - dailyPlantBasedDietEmissions;
+
+  const daysToOffset = co2Amount / dailyReduction;
+
+  if (daysToOffset < 1) {
+    return Math.max(1, Math.round(daysToOffset)) + ' days';
+  }
+
+  const monthsToOffset = daysToOffset / 30;
+  const yearsToOffset = daysToOffset / 365;
+
+  if (yearsToOffset >= 1) {
+    const years = Math.floor(yearsToOffset);
+    return years === 1 ? '1 year' : `${years} years`;
+  }
+
+  if (monthsToOffset >= 1) {
+    const months = Math.floor(monthsToOffset);
+    return months === 1 ? '1 month' : `${months} months`;
+  }
+
+  return Math.round(daysToOffset) + ' days';
+};
