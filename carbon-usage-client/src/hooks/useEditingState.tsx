@@ -6,6 +6,8 @@ import { User } from '@/interfaces/interfaces';
 import { consumptionService } from '@/services/consumptionService';
 import { useActivityTypeContext } from '@/contexts/ActivityTypeContext';
 
+type ActionType = 'delete' | 'edit';
+
 interface EditForm {
   activity_type_table_id: number;
   amount: number;
@@ -24,6 +26,10 @@ export const useEditingState = (
     {}
   );
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [modalAction, setModalAction] = useState<ActionType>('edit');
+  const [itemToProcess, setItemToProcess] = useState<number | null>(null);
 
   const handleEdit = (consumption: Consumption) => {
     const matchingActivity = activityTypes.find(
@@ -91,15 +97,23 @@ export const useEditingState = (
     setEditForm(updatedForm);
   };
 
-  const handleSaveEdit = async () => {
+  const handleSaveEdit = () => {
     if (!editingId || !editForm || Object.keys(changedFields).length === 0) {
       handleCancelEdit();
       return;
     }
 
+    setItemToProcess(editingId);
+    setModalAction('edit');
+    setIsModalOpen(true);
+  };
+
+  const confirmSaveEdit = async () => {
+    if (!itemToProcess || !changedFields) return;
+
     try {
       setIsSubmitting(true);
-      await consumptionService.updateConsumption(editingId, changedFields);
+      await consumptionService.updateConsumption(itemToProcess, changedFields);
 
       if (userContext?.userId) {
         await fetchConsumptions({ userId: userContext.userId });
@@ -111,16 +125,21 @@ export const useEditingState = (
       alert('Failed to update consumption');
     } finally {
       setIsSubmitting(false);
+      closeModal();
     }
   };
 
-  const handleDelete = async (id: number) => {
-    if (!window.confirm('Are you sure you want to delete this consumption?')) {
-      return;
-    }
+  const handleDelete = (id: number) => {
+    setItemToProcess(id);
+    setModalAction('delete');
+    setIsModalOpen(true);
+  };
+
+  const confirmDelete = async () => {
+    if (itemToProcess === null) return;
 
     try {
-      await consumptionService.deleteConsumption(id);
+      await consumptionService.deleteConsumption(itemToProcess);
 
       if (userContext?.userId) {
         await fetchConsumptions({ userId: userContext.userId });
@@ -128,6 +147,21 @@ export const useEditingState = (
     } catch (err) {
       console.error('Failed to delete consumption', err);
       alert('Failed to delete consumption');
+    } finally {
+      closeModal();
+    }
+  };
+
+  const closeModal = () => {
+    setIsModalOpen(false);
+    setItemToProcess(null);
+  };
+
+  const handleConfirm = () => {
+    if (modalAction === 'delete') {
+      confirmDelete();
+    } else if (modalAction === 'edit') {
+      confirmSaveEdit();
     }
   };
 
@@ -135,10 +169,14 @@ export const useEditingState = (
     editingId,
     editForm,
     isSubmitting,
+    isModalOpen,
+    modalAction,
     handleEdit,
     handleCancelEdit,
     handleInputChange,
     handleSaveEdit,
     handleDelete,
+    closeModal,
+    handleConfirm,
   };
 };

@@ -17,6 +17,7 @@ import EmptyState from './display/EmptyState';
 import TotalCO2Impact from './display/TotalCO2Impact';
 import LoadingSpinner from './display/LoadingSpinner';
 import ErrorMessage from './display/ErrorMessage';
+import ConfirmationModal from '@/components/ui/ConfirmationModal';
 
 export default function ConsumptionList() {
   const {
@@ -45,6 +46,10 @@ export default function ConsumptionList() {
     editingId,
     editForm,
     isSubmitting,
+    isModalOpen,
+    modalAction,
+    closeModal,
+    handleConfirm,
     handleEdit,
     handleCancelEdit,
     handleInputChange,
@@ -109,6 +114,12 @@ export default function ConsumptionList() {
             itemsPerPage={itemsPerPage}
             setItemsPerPage={setItemsPerPage}
             handlePageChange={handlePageChange}
+          />
+          <ConfirmationModal
+            isOpen={isModalOpen}
+            actionType={modalAction}
+            onClose={closeModal}
+            onConfirm={handleConfirm}
           />
         </>
       )}

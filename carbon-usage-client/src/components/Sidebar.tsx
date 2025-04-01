@@ -91,16 +91,12 @@ export default Sidebar;
 export const NAV_ITEMS: NavItemOrDivider[] = [
   {
     divider: true,
-    heading: 'Dashboard',
+    heading: 'Company Footprint',
   },
   {
     title: 'Dashboard',
     icon: <LayoutDashboard size={20} className="text-gray-600" />,
     path: '/dashboard',
-  },
-  {
-    divider: true,
-    heading: 'Company Footprint',
   },
   {
     title: 'Insert Consumption',
