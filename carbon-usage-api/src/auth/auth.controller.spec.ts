@@ -1,3 +1,11 @@
+/**
+ * Unit tests for AuthController
+ *
+ * This test suite covers the functionality of the AuthController,
+ * focusing on login, profile retrieval, and logout methods.
+ * It ensures proper handling of authentication processes,
+ * including successful login, error scenarios, and token management.
+ */
 /* eslint-disable @typescript-eslint/no-unsafe-argument */
 import { Test, TestingModule } from '@nestjs/testing';
 import { AuthController } from './auth.controller';
