@@ -1,3 +1,10 @@
+/**
+ * Unit tests for ActivityTypesService
+ *
+ * This test suite covers the functionality of the ActivityTypesService,
+ * focusing on the findAll method. It verifies interaction with SupabaseService,
+ * handling of successful data retrieval, empty results, and error scenarios.
+ */
 import { Test, TestingModule } from '@nestjs/testing';
 import { ActivityTypesService } from './activity-types.service';
 import { SupabaseService } from '../supabase/supabase.service';

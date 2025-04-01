@@ -1,3 +1,13 @@
+/**
+ * Unit tests for ActivityTypesController
+ *
+ * This test suite covers the functionality of the ActivityTypesController,
+ * focusing on the findAll method. It includes tests for:
+ * - Controller instantiation
+ * - Successful retrieval of activity types
+ * - Handling of empty results
+ * - Error propagation from the service
+ */
 import { Test, TestingModule } from '@nestjs/testing';
 import { ActivityTypesController } from './activity-types.controller';
 import { ActivityTypesService } from './activity-types.service';
