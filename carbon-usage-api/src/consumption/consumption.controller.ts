@@ -44,7 +44,16 @@ export class ConsumptionController {
     if (!hasAdvancedParams) {
       const consumption: Consumption[] =
         await this.consumptionService.getUserConsumption(user_id);
-      return consumption;
+
+      return {
+        data: consumption,
+        meta: {
+          total: consumption.length,
+          page: 1,
+          limit: consumption.length,
+          totalPages: 1,
+        },
+      };
     }
 
     const result = await this.consumptionService.getUserConsumptionPaginated({
