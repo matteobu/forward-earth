@@ -3,7 +3,6 @@ import React from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import {
   Building2,
-  Database,
   FileText,
   LayoutDashboard,
   ShoppingBag,
@@ -96,7 +95,7 @@ export const NAV_ITEMS: NavItemOrDivider[] = [
   },
   {
     title: 'Dashboard',
-    icon: <LayoutDashboard size={20} className="text-indigo-600" />,
+    icon: <LayoutDashboard size={20} className="text-gray-600" />,
     path: '/dashboard',
   },
   {
@@ -105,7 +104,7 @@ export const NAV_ITEMS: NavItemOrDivider[] = [
   },
   {
     title: 'Insert Consumption',
-    icon: <SquarePlus size={20} className="text-indigo-600" />,
+    icon: <SquarePlus size={20} className="text-gray-600" />,
     path: '/dashboard/consumptions/new',
   },
   {
@@ -114,22 +113,17 @@ export const NAV_ITEMS: NavItemOrDivider[] = [
     path: '/dashboard/consumptions/list',
   },
   {
-    title: 'Data collection',
-    icon: <Database size={20} className="text-gray-500" />,
-    path: '/data-collection',
-  },
-  {
     divider: true,
     heading: 'Product Footprint',
   },
   {
-    title: 'Product Catalogue',
+    title: 'Products Catalogue',
     icon: <ShoppingBag size={20} className="text-gray-500" />,
-    path: '/product-catalogue',
+    path: '/dashboard/products-catalogue',
   },
   {
     title: 'PCF assessment',
-    icon: <FileText size={20} className="text-gray-500" />,
+    icon: <FileText size={20} className="text-red-500" />,
     path: '/pcf-assessment',
   },
   {
@@ -137,13 +131,13 @@ export const NAV_ITEMS: NavItemOrDivider[] = [
     heading: 'Manage',
   },
   {
-    title: 'Company',
+    title: 'Company Dashboard',
     icon: <Building2 size={20} className="text-gray-500" />,
-    path: '/company',
+    path: '/dashboard/company-dashboard',
   },
   {
     title: 'Users',
-    icon: <Users size={20} className="text-gray-500" />,
+    icon: <Users size={20} className="text-red-500" />,
     path: '/users',
   },
 ];

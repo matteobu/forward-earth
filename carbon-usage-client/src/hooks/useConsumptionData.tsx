@@ -46,7 +46,6 @@ export const useConsumptionData = () => {
         activityType: activityFilter,
         ...params,
       });
-      console.log('API response:', result);
 
       if (result.data && result.meta) {
         setConsumptions(result.data);
@@ -74,9 +73,6 @@ export const useConsumptionData = () => {
 
       try {
         setIsLoading(true);
-        console.log(
-          `Richiesta pagina ${currentPage} con ${itemsPerPage} elementi per pagina`
-        );
 
         await fetchConsumptions({
           userId: userContext.userId,

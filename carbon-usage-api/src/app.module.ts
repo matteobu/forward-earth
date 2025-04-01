@@ -6,6 +6,8 @@ import { ConsumptionModule } from './consumption/consumption.module';
 import { ActivityTypesModule } from './activity-types/activity-types.module';
 import { UnitsModule } from './units/units.module';
 import { AuthModule } from './auth/auth.module';
+import { CompaniesModule } from './companies/companies.module';
+import { ProductsModule } from './products/products.module';
 
 @Module({
   imports: [
@@ -14,6 +16,8 @@ import { AuthModule } from './auth/auth.module';
     ActivityTypesModule,
     UnitsModule,
     AuthModule,
+    CompaniesModule,
+    ProductsModule,
   ],
   controllers: [AppController],
   providers: [AppService],
