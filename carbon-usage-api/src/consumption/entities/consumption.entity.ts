@@ -5,7 +5,7 @@ export class Consumption {
   activity_type_table_id: number;
   unit_id: number;
   co2_equivalent: number;
-  date: Date;
+  date: Date | string;
   created_at: string;
   deleted_at: string | null;
   unit_table: UnitTable;
@@ -20,5 +20,4 @@ export class ActivityTable {
   id: number;
   name: string;
   emission_factor: number;
-  activity_type_id: number;
 }
