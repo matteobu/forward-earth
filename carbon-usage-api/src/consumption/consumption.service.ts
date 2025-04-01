@@ -42,6 +42,10 @@ export class ConsumptionService {
     sortOrder: 'ASC' | 'DESC';
     dateFrom?: string;
     dateTo?: string;
+    amountMin?: number;
+    amountMax?: number;
+    co2Min?: number;
+    co2Max?: number;
     activityType?: number;
   }) {
     try {
@@ -59,6 +63,14 @@ export class ConsumptionService {
 
       if (params.activityType) {
         filters['activity_type_table_id'] = params.activityType;
+      }
+
+      if (params.amountMin !== undefined) {
+        filters['gte_amount'] = params.amountMin;
+      }
+
+      if (params.amountMax !== undefined) {
+        filters['lte_amount'] = params.amountMax;
       }
 
       const isNestedField = params.sortBy.includes('.');
@@ -92,27 +104,64 @@ export class ConsumptionService {
         });
       }
 
-      const processedData = sortedData.map(
-        (consumption: {
-          amount: number;
-          activity_table?: { emission_factor: number };
-          [key: string]: any;
-        }) => {
+      const processedData = sortedData
+        .map(
+          (consumption: {
+            amount: number;
+            activity_table?: { emission_factor: number };
+            [key: string]: any;
+          }) => {
+            if (
+              consumption.amount &&
+              consumption.activity_table &&
+              consumption.activity_table.emission_factor
+            ) {
+              const co2_equivalent =
+                consumption.amount * consumption.activity_table.emission_factor;
+              return {
+                ...consumption,
+                co2_equivalent: co2_equivalent,
+              };
+            }
+            return consumption;
+          },
+        )
+        .filter((consumption) => {
+          if (!consumption.co2_equivalent) return true;
+
           if (
-            consumption.amount &&
-            consumption.activity_table &&
-            consumption.activity_table.emission_factor
+            params.co2Min !== undefined &&
+            consumption.co2_equivalent < params.co2Min
           ) {
-            const co2_equivalent =
-              consumption.amount * consumption.activity_table.emission_factor;
-            return {
-              ...consumption,
-              co2_equivalent: co2_equivalent,
-            };
+            return false;
           }
-          return consumption;
-        },
-      );
+
+          if (
+            params.co2Max !== undefined &&
+            consumption.co2_equivalent > params.co2Max
+          ) {
+            return false;
+          }
+
+          return true;
+        });
+
+      if (params.co2Min !== undefined || params.co2Max !== undefined) {
+        const totalAfterCO2Filter = processedData.length;
+
+        const totalPagesAfterFilter = Math.ceil(
+          totalAfterCO2Filter / params.limit,
+        );
+
+        return {
+          data: processedData,
+          meta: {
+            ...result.meta,
+            total: totalAfterCO2Filter,
+            totalPages: totalPagesAfterFilter,
+          },
+        };
+      }
 
       return {
         data: processedData,

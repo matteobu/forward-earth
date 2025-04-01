@@ -14,6 +14,10 @@ export const consumptionService = {
     dateFrom?: string | null;
     dateTo?: string | null;
     activityType?: number | null;
+    amountMin?: number | null;
+    amountMax?: number | null;
+    co2Min?: number | null;
+    co2Max?: number | null;
   }) => {
     const {
       userId,
@@ -35,9 +39,14 @@ export const consumptionService = {
     if (sortOrder) queryParams.append('sortOrder', sortOrder.toUpperCase());
     if (dateFrom) queryParams.append('dateFrom', dateFrom);
     if (dateTo) queryParams.append('dateTo', dateTo);
+    if (params.amountMin)
+      queryParams.append('amountMin', params.amountMin.toString());
+    if (params.amountMax)
+      queryParams.append('amountMax', params.amountMax.toString());
+    if (params.co2Min) queryParams.append('co2Min', params.co2Min.toString());
+    if (params.co2Max) queryParams.append('co2Max', params.co2Max.toString());
     if (activityType)
       queryParams.append('activityType', activityType.toString());
-
     const queryString = queryParams.toString();
     if (queryString) {
       url += `?${queryString}`;

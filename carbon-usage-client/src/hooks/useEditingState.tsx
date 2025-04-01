@@ -15,11 +15,12 @@ interface EditForm {
 }
 
 export const useEditingState = (
-  fetchConsumptions: (params?: { userId: number }) => Promise<void>,
+  fetchConsumptions: (params?: {
+    [key: string]: string | number | null;
+  }) => Promise<void>,
   userContext: User
 ) => {
   const { activityTypes } = useActivityTypeContext();
-
   const [editingId, setEditingId] = useState<number | null>(null);
   const [editForm, setEditForm] = useState<EditForm | null>(null);
   const [changedFields, setChangedFields] = useState<ConsumptionPatchPayload>(
@@ -30,6 +31,30 @@ export const useEditingState = (
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [modalAction, setModalAction] = useState<ActionType>('edit');
   const [itemToProcess, setItemToProcess] = useState<number | null>(null);
+
+  const [showFilters, setShowFilters] = useState(false);
+  const [dateFilter, setDateFilter] = useState<{
+    from: Date | null;
+    to: Date | null;
+  }>({
+    from: null,
+    to: null,
+  });
+  const [activityFilter, setActivityFilter] = useState<number | null>(null);
+  const [amountFilter, setAmountFilter] = useState<{
+    min: number | null;
+    max: number | null;
+  }>({
+    min: null,
+    max: null,
+  });
+  const [co2Filter, setCO2Filter] = useState<{
+    min: number | null;
+    max: number | null;
+  }>({
+    min: null,
+    max: null,
+  });
 
   const handleEdit = (consumption: Consumption) => {
     const matchingActivity = activityTypes.find(
@@ -139,6 +164,7 @@ export const useEditingState = (
     if (itemToProcess === null) return;
 
     try {
+      setIsSubmitting(true);
       await consumptionService.deleteConsumption(itemToProcess);
 
       if (userContext?.userId) {
@@ -148,6 +174,7 @@ export const useEditingState = (
       console.error('Failed to delete consumption', err);
       alert('Failed to delete consumption');
     } finally {
+      setIsSubmitting(false);
       closeModal();
     }
   };
@@ -165,12 +192,94 @@ export const useEditingState = (
     }
   };
 
+  const applyFilters = async () => {
+    setIsSubmitting(true);
+    try {
+      const filterParams: {
+        userId: number;
+        dateFrom?: string;
+        dateTo?: string;
+        activityTypeId?: number;
+        activityType?: number;
+        amountMin?: number;
+        amountMax?: number;
+        co2Min?: number;
+        co2Max?: number;
+      } = {
+        userId: userContext.userId,
+      };
+
+      if (dateFilter.from) {
+        const day = dateFilter.from.getDate().toString().padStart(2, '0');
+        const month = (dateFilter.from.getMonth() + 1)
+          .toString()
+          .padStart(2, '0');
+        const year = dateFilter.from.getFullYear();
+
+        filterParams.dateFrom = `${year}-${month}-${day}`;
+      }
+
+      if (dateFilter.to) {
+        const day = dateFilter.to.getDate().toString().padStart(2, '0');
+        const month = (dateFilter.to.getMonth() + 1)
+          .toString()
+          .padStart(2, '0');
+        const year = dateFilter.to.getFullYear();
+
+        filterParams.dateTo = `${year}-${month}-${day}`;
+      }
+
+      if (activityFilter !== null) {
+        filterParams.activityType = activityFilter;
+      }
+
+      if (amountFilter.min !== null) {
+        filterParams.amountMin = amountFilter.min;
+      }
+
+      if (amountFilter.max !== null) {
+        filterParams.amountMax = amountFilter.max;
+      }
+
+      if (co2Filter.min !== null) {
+        filterParams.co2Min = co2Filter.min;
+      }
+
+      if (co2Filter.max !== null) {
+        filterParams.co2Max = co2Filter.max;
+      }
+      console.log(filterParams);
+      await fetchConsumptions(filterParams);
+    } catch (err) {
+      console.error('Failed to apply filters', err);
+      alert('Failed to apply filters');
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const clearFilters = () => {
+    setDateFilter({ from: null, to: null });
+    setActivityFilter(null);
+    setAmountFilter({ min: null, max: null });
+    setCO2Filter({ min: null, max: null });
+  };
+
+  const toggleFilters = () => {
+    setShowFilters(!showFilters);
+  };
+
   return {
     editingId,
     editForm,
     isSubmitting,
     isModalOpen,
     modalAction,
+    showFilters,
+    dateFilter,
+    activityFilter,
+    amountFilter,
+    co2Filter,
     handleEdit,
     handleCancelEdit,
     handleInputChange,
@@ -178,5 +287,12 @@ export const useEditingState = (
     handleDelete,
     closeModal,
     handleConfirm,
+    setDateFilter,
+    setActivityFilter,
+    setAmountFilter,
+    setCO2Filter,
+    applyFilters,
+    clearFilters,
+    toggleFilters,
   };
 };
