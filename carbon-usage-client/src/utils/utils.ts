@@ -1,4 +1,4 @@
-import { Consumption } from './types';
+import { ActivityType, Consumption } from './types';
 
 /**
  * Checks if there are any changes in the consumption data
@@ -51,4 +51,50 @@ export const formatNumber = (num: number) => {
   const numStr = num.toFixed(1);
   const [intPart, decPart] = numStr.split('.');
   return `${intPart.replace(/\B(?=(\d{3})+(?!\d))/g, '.')},${decPart}`;
+};
+
+// Group activities by category for better organization
+export const ACTIVITY_CATEGORIES = {
+  Energy: ['Electricity', 'Natural Gas', 'Heating Oil'],
+  Transportation: [
+    'Business Travel - Air',
+    'Business Travel - Rail',
+    'Company Vehicles',
+    'Shipping',
+  ],
+  'Waste & Materials': [
+    'Landfill Waste',
+    'Recycled Paper',
+    'Recycled Plastic',
+    'Office Paper Usage',
+  ],
+  Water: ['Water Supply', 'Wastewater Treatment'],
+  Other: [
+    'Refrigerant Leakage',
+    'Data Center Usage',
+    'Cloud Services',
+    'Employee Remote Work',
+  ],
+};
+
+// Find category for a specific activity type
+export const getCategoryForActivity = (activityName: string): string => {
+  for (const [category, activities] of Object.entries(ACTIVITY_CATEGORIES)) {
+    if (activities.some((activity) => activityName.includes(activity))) {
+      return category;
+    }
+  }
+  return 'Other';
+};
+
+// Get activities by category
+export const getActivitiesByCategory = (
+  category: string,
+  activityTypes: ActivityType[]
+) => {
+  if (!category) return activityTypes;
+
+  return activityTypes.filter(
+    (type) => getCategoryForActivity(type.name) === category
+  );
 };

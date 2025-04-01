@@ -6,6 +6,7 @@ import { useNavigate } from 'react-router-dom';
 import { ActivityType } from '@/utils/types';
 import { useUser } from '@/contexts/UserContext';
 import { useActivityTypeContext } from '@/contexts/ActivityTypeContext';
+import { ACTIVITY_CATEGORIES, getActivitiesByCategory } from '@/utils/utils';
 
 export default function ConsumptionForm() {
   const navigate = useNavigate();
@@ -23,49 +24,6 @@ export default function ConsumptionForm() {
   const [co2Impact, setCo2Impact] = useState<number | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<string>('');
-
-  // Group activities by category for better organization
-  const activityCategories = {
-    Energy: ['Electricity', 'Natural Gas', 'Heating Oil'],
-    Transportation: [
-      'Business Travel - Air',
-      'Business Travel - Rail',
-      'Company Vehicles',
-      'Shipping',
-    ],
-    'Waste & Materials': [
-      'Landfill Waste',
-      'Recycled Paper',
-      'Recycled Plastic',
-      'Office Paper Usage',
-    ],
-    Water: ['Water Supply', 'Wastewater Treatment'],
-    Other: [
-      'Refrigerant Leakage',
-      'Data Center Usage',
-      'Cloud Services',
-      'Employee Remote Work',
-    ],
-  };
-
-  // Find category for a specific activity type
-  const getCategoryForActivity = (activityName: string): string => {
-    for (const [category, activities] of Object.entries(activityCategories)) {
-      if (activities.some((activity) => activityName.includes(activity))) {
-        return category;
-      }
-    }
-    return 'Other';
-  };
-
-  // Get activities by category
-  const getActivitiesByCategory = (category: string) => {
-    if (!category) return activityTypes;
-
-    return activityTypes.filter(
-      (type) => getCategoryForActivity(type.name) === category
-    );
-  };
 
   useEffect(() => {
     if (formData.activity_type_table_id) {
@@ -179,7 +137,7 @@ export default function ConsumptionForm() {
       <form onSubmit={handleSubmit} className="space-y-6">
         {/* Category Selection */}
         <div className="grid grid-cols-1 md:grid-cols-5 gap-4 mb-6">
-          {Object.keys(activityCategories).map((category) => (
+          {Object.keys(ACTIVITY_CATEGORIES).map((category) => (
             <div
               key={category}
               className={`relative cursor-pointer rounded-lg p-4 text-center transition-all hover:bg-indigo-50 hover:shadow-md
@@ -219,7 +177,7 @@ export default function ConsumptionForm() {
           >
             <option value="">Select an activity type...</option>
             {(selectedCategory
-              ? getActivitiesByCategory(selectedCategory)
+              ? getActivitiesByCategory(selectedCategory, activityTypes)
               : activityTypes
             ).map((type) => (
               <option key={type.id} value={type.id}>
