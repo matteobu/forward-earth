@@ -35,6 +35,7 @@ export const useConsumptionData = () => {
   const [activityFilter, setActivityFilter] = useState<number | null>(null);
 
   const fetchConsumptions = async (params = {}) => {
+    console.log(params);
     try {
       const result = await consumptionService.fetchConsumptions({
         userId: userContext.userId,

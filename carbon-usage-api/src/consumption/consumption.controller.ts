@@ -30,6 +30,10 @@ export class ConsumptionController {
     @Query('sortOrder') sortOrder?: 'ASC' | 'DESC',
     @Query('dateFrom') dateFrom?: string,
     @Query('dateTo') dateTo?: string,
+    @Query('amountMin') amountMin?: string,
+    @Query('amountMax') amountMax?: string,
+    @Query('co2Min') co2Min?: number,
+    @Query('co2Max') co2Max?: number,
     @Query('activityType') activityType?: number,
   ) {
     const hasAdvancedParams =
@@ -39,6 +43,10 @@ export class ConsumptionController {
       sortOrder !== undefined ||
       dateFrom !== undefined ||
       dateTo !== undefined ||
+      amountMin !== undefined ||
+      amountMax !== undefined ||
+      co2Max !== undefined ||
+      co2Min !== undefined ||
       activityType !== undefined;
 
     if (!hasAdvancedParams) {
@@ -65,6 +73,10 @@ export class ConsumptionController {
       dateFrom,
       dateTo,
       activityType: activityType ? +activityType : undefined,
+      amountMin: amountMin ? +amountMin : undefined,
+      amountMax: amountMax ? +amountMax : undefined,
+      co2Min: co2Min ? +co2Min : undefined,
+      co2Max: co2Max ? +co2Max : undefined,
     });
 
     return result;
