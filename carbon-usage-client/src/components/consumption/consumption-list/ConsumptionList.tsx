@@ -18,6 +18,7 @@ import TotalCO2Impact from './display/TotalCO2Impact';
 import LoadingSpinner from './display/LoadingSpinner';
 import ErrorMessage from './display/ErrorMessage';
 import ConfirmationModal from '@/components/ui/ConfirmationModal';
+import NoResultsMessage from './display/NoResultConsumption';
 
 export default function ConsumptionList() {
   const {
@@ -28,15 +29,11 @@ export default function ConsumptionList() {
     itemsPerPage,
     totalItems,
     totalPages,
-    dateFilter,
-    activityFilter,
     fetchConsumptions,
     handleSort,
     renderSortIndicator,
     handlePageChange,
     setItemsPerPage,
-    handleFilterChange,
-    clearFilters,
     calculateTotalCO2,
   } = useConsumptionData();
 
@@ -48,6 +45,16 @@ export default function ConsumptionList() {
     isSubmitting,
     isModalOpen,
     modalAction,
+    dateFilter,
+    activityFilter,
+    amountFilter,
+    co2Filter,
+    setDateFilter,
+    setActivityFilter,
+    setAmountFilter,
+    setCO2Filter,
+    applyFilters,
+    clearFilters,
     closeModal,
     handleConfirm,
     handleEdit,
@@ -62,6 +69,7 @@ export default function ConsumptionList() {
   const toggleFilters = () => {
     setShowFilters(!showFilters);
   };
+
   if (isLoading) {
     return <LoadingSpinner />;
   }
@@ -72,8 +80,35 @@ export default function ConsumptionList() {
 
   return (
     <div>
-      {!consumptions || consumptions.length === 0 ? (
+      {!consumptions ? (
         <EmptyState />
+      ) : consumptions.length === 0 ? (
+        <>
+          <ConsumptionHeader />
+
+          {showFilters && (
+            <FilterSection
+              dateFilter={dateFilter}
+              activityFilter={activityFilter}
+              amountFilter={amountFilter}
+              co2ImpactFilter={co2Filter}
+              onDateFilterChange={setDateFilter}
+              onActivityFilterChange={setActivityFilter}
+              onAmountFilterChange={setAmountFilter}
+              onCO2FilterChange={setCO2Filter}
+              clearFilters={clearFilters}
+              applyFilters={() => {
+                applyFilters();
+                toggleFilters();
+              }}
+              isSubmitting={isSubmitting}
+            />
+          )}
+          <NoResultsMessage
+            clearFilters={clearFilters}
+            applyFilters={applyFilters}
+          />
+        </>
       ) : (
         <>
           <TotalCO2Impact totalCO2={calculateTotalCO2(consumptions)} />
@@ -84,10 +119,21 @@ export default function ConsumptionList() {
             <FilterSection
               dateFilter={dateFilter}
               activityFilter={activityFilter}
-              handleFilterChange={handleFilterChange}
+              amountFilter={amountFilter}
+              co2ImpactFilter={co2Filter}
+              onDateFilterChange={setDateFilter}
+              onActivityFilterChange={setActivityFilter}
+              onAmountFilterChange={setAmountFilter}
+              onCO2FilterChange={setCO2Filter}
               clearFilters={clearFilters}
+              applyFilters={() => {
+                applyFilters();
+                toggleFilters();
+              }}
+              isSubmitting={isSubmitting}
             />
           )}
+
           {/* Consumption Table */}
           <ConsumptionTable
             consumptions={consumptions}
@@ -105,6 +151,7 @@ export default function ConsumptionList() {
             formatDate={formatDate}
             renderSortIndicator={renderSortIndicator}
           />
+
           {/* Pagination Controls */}
           <PaginationControls
             currentPage={currentPage}
@@ -115,6 +162,7 @@ export default function ConsumptionList() {
             setItemsPerPage={setItemsPerPage}
             handlePageChange={handlePageChange}
           />
+
           <ConfirmationModal
             isOpen={isModalOpen}
             actionType={modalAction}
