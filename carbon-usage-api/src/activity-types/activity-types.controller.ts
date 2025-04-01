@@ -5,8 +5,6 @@ import { ActivityTypesService } from './activity-types.service';
 export class ActivityTypesController {
   constructor(private readonly activityTypesService: ActivityTypesService) {}
 
-  // TODO: Give the user with admin role the authorization to add new ActivityType
-
   @Get()
   findAll() {
     return this.activityTypesService.findAll();

@@ -1,6 +1,4 @@
 import { Module } from '@nestjs/common';
-import { AppController } from './app.controller';
-import { AppService } from './app.service';
 import { UsersModule } from './users/users.module';
 import { ConsumptionModule } from './consumption/consumption.module';
 import { ActivityTypesModule } from './activity-types/activity-types.module';
@@ -8,6 +6,7 @@ import { UnitsModule } from './units/units.module';
 import { AuthModule } from './auth/auth.module';
 import { CompaniesModule } from './companies/companies.module';
 import { ProductsModule } from './products/products.module';
+import { SupabaseModule } from './supabase/supabase.module';
 
 @Module({
   imports: [
@@ -18,8 +17,9 @@ import { ProductsModule } from './products/products.module';
     AuthModule,
     CompaniesModule,
     ProductsModule,
+    SupabaseModule,
   ],
-  controllers: [AppController],
-  providers: [AppService],
+  controllers: [],
+  providers: [],
 })
 export class AppModule {}

@@ -7,7 +7,7 @@ import {
   CreateConsumptionDto,
   PatchConsumptionDto,
 } from 'src/consumption/dto/create-consumption.dto';
-import { ActivityTypeTable } from 'src/activity-types/entities/activity-type.entity';
+import { ActivityTypeTable } from '../activity-types/entities/activity-type.entity';
 
 dotenv.config();
 
