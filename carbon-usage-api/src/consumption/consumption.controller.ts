@@ -11,11 +11,7 @@ import {
   Query,
 } from '@nestjs/common';
 import { ConsumptionService } from './consumption.service';
-import {
-  CreateConsumptionDto,
-  PatchConsumptionDto,
-} from './dto/create-consumption.dto';
-import { Consumption } from './entities/consumption.entity';
+import { CreateConsumptionDto } from './dto/create-consumption.dto';
 
 @Controller('consumption')
 export class ConsumptionController {
@@ -36,57 +32,53 @@ export class ConsumptionController {
     @Query('co2Max') co2Max?: number,
     @Query('activityType') activityType?: number,
   ) {
-    const hasAdvancedParams =
-      page !== undefined ||
-      limit !== undefined ||
-      sortBy !== undefined ||
-      sortOrder !== undefined ||
-      dateFrom !== undefined ||
-      dateTo !== undefined ||
-      amountMin !== undefined ||
-      amountMax !== undefined ||
-      co2Max !== undefined ||
-      co2Min !== undefined ||
-      activityType !== undefined;
+    const filters: Record<string, any> = { user_id };
 
-    if (!hasAdvancedParams) {
-      const consumption: Consumption[] =
-        await this.consumptionService.getUserConsumption(user_id);
+    if (amountMin !== undefined) filters['gte_amount'] = +amountMin;
+    if (amountMax !== undefined) filters['lte_amount'] = +amountMax;
+    if (co2Min !== undefined) filters['gte_co2_equivalent'] = +co2Min;
+    if (co2Max !== undefined) filters['lte_co2_equivalent'] = +co2Max;
+    if (activityType !== undefined)
+      filters['activity_type_table_id'] = +activityType;
+    if (dateFrom) filters['gte_date'] = dateFrom;
+    if (dateTo) filters['lte_date'] = dateTo;
 
-      return {
-        data: consumption,
-        meta: {
-          total: consumption.length,
-          page: 1,
-          limit: consumption.length,
-          totalPages: 1,
-        },
-      };
+    interface PaginationOptions {
+      user_id: number;
+      page: number;
+      limit: number;
+      sortBy: string;
+      sortOrder: 'ASC' | 'DESC';
+      dateFrom?: string;
+      dateTo?: string;
+      amountMin?: number;
+      amountMax?: number;
+      co2Min?: number;
+      co2Max?: number;
+      activityType?: number;
     }
 
-    const result = await this.consumptionService.getUserConsumptionPaginated({
+    return await this.consumptionService.getUserConsumption({
       user_id,
       page: page || 1,
       limit: limit || 10,
       sortBy: sortBy || 'date',
-      sortOrder: sortOrder || 'DESC',
+      sortOrder: sortOrder || 'ASC',
       dateFrom,
       dateTo,
-      activityType: activityType ? +activityType : undefined,
       amountMin: amountMin ? +amountMin : undefined,
       amountMax: amountMax ? +amountMax : undefined,
-      co2Min: co2Min ? +co2Min : undefined,
-      co2Max: co2Max ? +co2Max : undefined,
-    });
-
-    return result;
+      co2Min,
+      co2Max,
+      activityType,
+    } satisfies PaginationOptions);
   }
 
   @Post('create')
   async create(@Body() createConsumptionDto: CreateConsumptionDto) {
     try {
       const result = await this.consumptionService.create(createConsumptionDto);
-
+      console.log({ result });
       return {
         message: 'Consumption added successfully',
         data: result,
@@ -104,14 +96,25 @@ export class ConsumptionController {
 
   @Delete('delete/:id')
   async remove(@Param('id') id: string) {
-    return this.consumptionService.remove(+id);
+    try {
+      const result = await this.consumptionService.remove(+id);
+      return {
+        message: 'Consumption deleted successfully',
+        data: result,
+      };
+    } catch (error) {
+      throw new HttpException(
+        {
+          message: 'Failed to delete consumption',
+          error: error.message,
+        },
+        HttpStatus.BAD_REQUEST,
+      );
+    }
   }
 
   @Patch('patch/:id')
-  async patch(
-    @Param('id') id: string,
-    @Body() patchConsumptionDto: PatchConsumptionDto,
-  ) {
+  async patch(@Param('id') id: string, @Body() patchConsumptionDto: any) {
     try {
       const result = await this.consumptionService.patch(
         +id,

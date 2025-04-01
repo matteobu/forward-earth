@@ -1,28 +1,28 @@
 import { Injectable } from '@nestjs/common';
-import {
-  CreateConsumptionDto,
-  PatchConsumptionDto,
-} from './dto/create-consumption.dto';
-import { SupabaseService } from 'src/supabase/supabase.service';
+import { SupabaseService } from '../supabase/supabase.service';
+import { Consumption } from './entities/consumption.entity';
+import { CreateConsumptionDto } from './dto/create-consumption.dto';
 
 @Injectable()
 export class ConsumptionService {
   constructor(private readonly supabaseService: SupabaseService) {}
 
   async create(createConsumptionDto: CreateConsumptionDto) {
-    return this.supabaseService.createConsumption({
+    const result = await this.supabaseService.createConsumption({
       user_id: createConsumptionDto.user_id,
       amount: createConsumptionDto.amount,
-      activity_type_id: createConsumptionDto.activity_type_id,
-      activity_name: createConsumptionDto.activity_name,
-      emission_factor: createConsumptionDto.emission_factor,
+      activity_type_id: createConsumptionDto.activity_type_table_id,
+      activity_name: createConsumptionDto.activity_table?.name,
+      emission_factor: createConsumptionDto.activity_table?.emission_factor,
       date: createConsumptionDto.date,
       co2_equivalent: createConsumptionDto.co2_equivalent,
-      unit: createConsumptionDto.unit,
+      unit: createConsumptionDto.unit_table?.name,
     });
+
+    return result;
   }
 
-  async patch(id: number, patchConsumptionDto: PatchConsumptionDto) {
+  async patch(id: number, patchConsumptionDto: any) {
     return this.supabaseService.updateUserConsumption(id, patchConsumptionDto);
   }
 
@@ -30,11 +30,7 @@ export class ConsumptionService {
     return this.supabaseService.deleteUserConsumption(id);
   }
 
-  async getUserConsumption(user_id: number) {
-    return this.supabaseService.getUserConsumption(user_id);
-  }
-
-  async getUserConsumptionPaginated(params: {
+  async getUserConsumption(params: {
     user_id: number;
     page: number;
     limit: number;
@@ -77,7 +73,7 @@ export class ConsumptionService {
 
       const orderBy = isNestedField ? 'date' : params.sortBy;
 
-      const result = await this.supabaseService.getPaginatedData(
+      const result = await this.supabaseService.getUserConsumption(
         'ConsumptionTable',
         {
           select: '*, ActivityTypeTable(*), UnitTable(*)',
@@ -104,45 +100,44 @@ export class ConsumptionService {
         });
       }
 
-      const processedData = sortedData
-        .map(
-          (consumption: {
-            amount: number;
-            activity_table?: { emission_factor: number };
-            [key: string]: any;
-          }) => {
-            if (
-              consumption.amount &&
-              consumption.activity_table &&
-              consumption.activity_table.emission_factor
-            ) {
-              const co2_equivalent =
-                consumption.amount * consumption.activity_table.emission_factor;
-              return {
-                ...consumption,
-                co2_equivalent: co2_equivalent,
-              };
-            }
-            return consumption;
-          },
-        )
+      const processedData: Consumption[] = sortedData
+        .map((consumption: any) => {
+          let co2_equivalent = consumption.co2_equivalent;
+          if (
+            consumption.amount &&
+            consumption.activity_table &&
+            consumption.activity_table.emission_factor
+          ) {
+            co2_equivalent =
+              consumption.amount * consumption.activity_table.emission_factor;
+          }
+          return {
+            id: consumption.id,
+            user_id: consumption.user_id,
+            amount: consumption.amount,
+            activity_type_table_id: consumption.activity_type_table_id,
+            unit_id: consumption.unit_id,
+            co2_equivalent,
+            date: consumption.date,
+            created_at: consumption.created_at,
+            deleted_at: consumption.deleted_at,
+            activity_table: consumption.activity_table,
+            unit_table: consumption.unit_table,
+          };
+        })
         .filter((consumption) => {
-          if (!consumption.co2_equivalent) return true;
-
           if (
             params.co2Min !== undefined &&
             consumption.co2_equivalent < params.co2Min
           ) {
             return false;
           }
-
           if (
             params.co2Max !== undefined &&
             consumption.co2_equivalent > params.co2Max
           ) {
             return false;
           }
-
           return true;
         });
 

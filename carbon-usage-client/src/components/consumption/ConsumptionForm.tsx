@@ -14,7 +14,7 @@ export default function ConsumptionForm() {
 
   const [formData, setFormData] = useState({
     amount: '',
-    activity_type_id: '',
+    activity_type_table_id: '',
     date: new Date().toISOString().split('T')[0],
   });
   const [selectedActivity, setSelectedActivity] = useState<ActivityType | null>(
@@ -68,9 +68,9 @@ export default function ConsumptionForm() {
   };
 
   useEffect(() => {
-    if (formData.activity_type_id) {
+    if (formData.activity_type_table_id) {
       const activity = activityTypes.find(
-        (type) => type.activity_type_id.toString() === formData.activity_type_id
+        (type) => type.id.toString() === formData.activity_type_table_id
       );
       setSelectedActivity(activity || null);
     } else {
@@ -78,7 +78,7 @@ export default function ConsumptionForm() {
     }
 
     updateCo2Impact(formData.amount, selectedActivity);
-  }, [formData.activity_type_id]);
+  }, [formData.activity_type_table_id]);
 
   useEffect(() => {
     updateCo2Impact(formData.amount, selectedActivity);
@@ -108,27 +108,31 @@ export default function ConsumptionForm() {
     e.preventDefault();
     setIsSubmitting(true);
 
-    const submissionData = {
-      ...formData,
-      co2_equivalent: co2Impact,
-      unit: selectedActivity?.unit,
-    };
-
     try {
       const response = await fetch('http://localhost:3000/consumption/create', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           user_id: userContext.userId,
-          amount: parseFloat(submissionData.amount),
-          activity_type_id: parseInt(submissionData.activity_type_id),
-          date: submissionData.date,
-          co2_equivalent: submissionData.co2_equivalent,
-          unit: submissionData.unit,
-          activity_name: selectedActivity ? selectedActivity.name : '',
-          emission_factor: selectedActivity
-            ? selectedActivity.emission_factor
-            : 0,
+          amount: parseFloat(formData.amount),
+          activity_type_table_id: parseInt(formData.activity_type_table_id),
+          date: formData.date,
+          co2_equivalent: co2Impact,
+          unit_id: selectedActivity ? selectedActivity.id : null,
+          unit_table: selectedActivity
+            ? {
+                id: selectedActivity.id,
+                name: selectedActivity.unit,
+              }
+            : null,
+          activity_table: selectedActivity
+            ? {
+                id: selectedActivity.id,
+                name: selectedActivity.name,
+                emission_factor: selectedActivity.emission_factor,
+                activity_type_id: selectedActivity.id,
+              }
+            : null,
         }),
         credentials: 'include',
       });
@@ -137,7 +141,6 @@ export default function ConsumptionForm() {
         throw new Error(`Error: ${response.status}`);
       }
 
-      // Success - navigate away
       navigate('/dashboard/consumptions/list');
     } catch (error) {
       console.error('Failed to create consumption', error);
@@ -208,8 +211,8 @@ export default function ConsumptionForm() {
             Activity Type
           </label>
           <select
-            name="activity_type_id"
-            value={formData.activity_type_id}
+            name="activity_type_table_id"
+            value={formData.activity_type_table_id}
             onChange={handleChange}
             className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-indigo-300 focus:border-indigo-500 transition-colors"
             required
@@ -219,7 +222,7 @@ export default function ConsumptionForm() {
               ? getActivitiesByCategory(selectedCategory)
               : activityTypes
             ).map((type) => (
-              <option key={type.activity_type_id} value={type.activity_type_id}>
+              <option key={type.id} value={type.id}>
                 {type.name}
               </option>
             ))}

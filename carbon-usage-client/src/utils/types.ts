@@ -1,8 +1,8 @@
 export type ActivityType = {
+  id: number;
   name: string;
   emission_factor: number;
-  activity_type_id: number;
-  unit: string;
+  unit?: string;
 };
 
 export type Consumption = {
@@ -14,7 +14,6 @@ export type Consumption = {
   co2_equivalent: number;
   date: string;
   created_at: string;
-  unit_name: string;
   unit_table: Unit;
   activity_table: ActivityType;
 };
@@ -23,6 +22,13 @@ export type Unit = {
   id: number;
   name: string;
 };
+
+export interface PaginationMeta {
+  total: number;
+  page: number;
+  limit: number;
+  totalPages: number;
+}
 
 export interface ConsumptionPatchPayload extends Partial<Consumption> {
   activity_type_name?: string;

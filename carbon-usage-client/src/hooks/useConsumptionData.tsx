@@ -1,6 +1,6 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { useState, useEffect } from 'react';
-import { Consumption } from '@/utils/types';
+import { Consumption, PaginationMeta } from '@/utils/types';
 import { useUser } from '@/contexts/UserContext';
 import { consumptionService } from '@/services/consumptionService';
 import { calculateTotalCO2 } from '@/utils/utils';
@@ -37,17 +37,18 @@ export const useConsumptionData = () => {
   const fetchConsumptions = async (params = {}) => {
     console.log(params);
     try {
-      const result = await consumptionService.fetchConsumptions({
-        userId: userContext.userId,
-        page: currentPage,
-        limit: itemsPerPage,
-        sortBy: sortField,
-        sortOrder: sortDirection,
-        dateFrom: dateFilter.from,
-        dateTo: dateFilter.to,
-        activityType: activityFilter,
-        ...params,
-      });
+      const result: { data: Consumption[]; meta: PaginationMeta } =
+        await consumptionService.fetchConsumptions({
+          userId: userContext.userId,
+          page: currentPage,
+          limit: itemsPerPage,
+          sortBy: sortField,
+          sortOrder: sortDirection,
+          dateFrom: dateFilter.from,
+          dateTo: dateFilter.to,
+          activityType: activityFilter,
+          ...params,
+        });
 
       if (result.data && result.meta) {
         setConsumptions(result.data);
