@@ -65,10 +65,7 @@ const ConsumptionTableRow: React.FC<ConsumptionRowProps> = ({
             className="border rounded p-1 w-full"
           >
             {allActivityType.map((activity) => (
-              <option
-                key={activity.activity_type_id}
-                value={activity.activity_type_id}
-              >
+              <option key={activity.id} value={activity.id}>
                 {activity.name}
               </option>
             ))}

@@ -1,6 +1,10 @@
 import { useState } from 'react';
 
-import { Consumption, ConsumptionPatchPayload } from '@/utils/types';
+import {
+  Consumption,
+  ConsumptionPatchPayload,
+  PaginationMeta,
+} from '@/utils/types';
 
 import { User } from '@/interfaces/interfaces';
 import { consumptionService } from '@/services/consumptionService';
@@ -17,7 +21,10 @@ interface EditForm {
 export const useEditingState = (
   fetchConsumptions: (params?: {
     [key: string]: string | number | null;
-  }) => Promise<void>,
+  }) => Promise<{
+    data: Consumption[];
+    meta: PaginationMeta;
+  }>,
   userContext: User
 ) => {
   const { activityTypes } = useActivityTypeContext();
@@ -62,7 +69,7 @@ export const useEditingState = (
     );
 
     const activityId = matchingActivity
-      ? matchingActivity.activity_type_id
+      ? matchingActivity.id
       : consumption.activity_type_table_id;
 
     setEditingId(consumption.id);
@@ -93,7 +100,7 @@ export const useEditingState = (
       updatedForm.activity_type_table_id = parseInt(value, 10);
 
       const selectedActivity = activityTypes.find(
-        (activity) => activity.activity_type_id === parseInt(value, 10)
+        (activity) => activity.id === parseInt(value, 10)
       );
 
       if (selectedActivity) {
@@ -208,8 +215,11 @@ export const useEditingState = (
       } = {
         userId: userContext.userId,
       };
-
-      if (dateFilter.from) {
+      if (
+        dateFilter.from &&
+        dateFilter.from instanceof Date &&
+        !isNaN(dateFilter.from.getTime())
+      ) {
         const day = dateFilter.from.getDate().toString().padStart(2, '0');
         const month = (dateFilter.from.getMonth() + 1)
           .toString()
@@ -219,7 +229,11 @@ export const useEditingState = (
         filterParams.dateFrom = `${year}-${month}-${day}`;
       }
 
-      if (dateFilter.to) {
+      if (
+        dateFilter.to &&
+        dateFilter.to instanceof Date &&
+        !isNaN(dateFilter.to.getTime())
+      ) {
         const day = dateFilter.to.getDate().toString().padStart(2, '0');
         const month = (dateFilter.to.getMonth() + 1)
           .toString()
@@ -248,7 +262,6 @@ export const useEditingState = (
       if (co2Filter.max !== null) {
         filterParams.co2Max = co2Filter.max;
       }
-      console.log(filterParams);
       await fetchConsumptions(filterParams);
     } catch (err) {
       console.error('Failed to apply filters', err);

@@ -52,7 +52,6 @@ const FilterSection: React.FC<FilterSectionProps> = ({
 }) => {
   const { activityTypes } = useActivityTypeContext();
 
-  // Handle amount filter changes
   const handleAmountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     const numValue = value === '' ? null : Number(value);
@@ -168,10 +167,7 @@ const FilterSection: React.FC<FilterSectionProps> = ({
             >
               <option value="">All Activities</option>
               {activityTypes.map((activity) => (
-                <option
-                  key={activity.activity_type_id}
-                  value={activity.activity_type_id}
-                >
+                <option key={activity.id} value={activity.id}>
                   {activity.name}
                 </option>
               ))}

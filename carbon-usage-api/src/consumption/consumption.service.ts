@@ -11,7 +11,7 @@ export class ConsumptionService {
     const result = await this.supabaseService.createConsumption({
       user_id: createConsumptionDto.user_id,
       amount: createConsumptionDto.amount,
-      activity_type_id: createConsumptionDto.activity_type_table_id,
+      activity_type_table_id: createConsumptionDto.activity_type_table_id,
       activity_name: createConsumptionDto.activity_table?.name,
       emission_factor: createConsumptionDto.activity_table?.emission_factor,
       date: createConsumptionDto.date,

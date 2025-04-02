@@ -34,8 +34,14 @@ export const useConsumptionData = () => {
   }>({ from: null, to: null });
   const [activityFilter, setActivityFilter] = useState<number | null>(null);
 
-  const fetchConsumptions = async (params = {}) => {
-    console.log(params);
+  const fetchConsumptions = async (
+    params: {
+      dateFrom?: string | null;
+      dateTo?: string | null;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      [key: string]: any;
+    } = {}
+  ) => {
     try {
       const result: { data: Consumption[]; meta: PaginationMeta } =
         await consumptionService.fetchConsumptions({
