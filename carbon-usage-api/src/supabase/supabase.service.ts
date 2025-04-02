@@ -141,10 +141,20 @@ export class SupabaseService {
         if (value !== undefined && value !== null) {
           if (key.startsWith('gte_')) {
             const field = key.replace('gte_', '');
-            query = query.gte(field, Number(value));
+
+            if (field === 'date') {
+              query = query.gte(field, value);
+            } else {
+              query = query.gte(field, Number(value));
+            }
           } else if (key.startsWith('lte_')) {
             const field = key.replace('lte_', '');
-            query = query.lte(field, Number(value));
+
+            if (field === 'date') {
+              query = query.lte(field, value);
+            } else {
+              query = query.lte(field, Number(value));
+            }
           } else {
             query = query.eq(key, value);
           }
@@ -237,7 +247,7 @@ export class SupabaseService {
           id: newId,
           user_id: consumptionData.user_id,
           amount: consumptionData.amount,
-          activity_type_table_id: consumptionData.activity_type_id,
+          activity_type_table_id: consumptionData.activity_type_table_id,
           unit_id: unitId.id,
           co2_equivalent: consumptionData.co2_equivalent,
           date: consumptionData.date,

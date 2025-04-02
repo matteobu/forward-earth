@@ -78,7 +78,7 @@ export class ConsumptionController {
   async create(@Body() createConsumptionDto: CreateConsumptionDto) {
     try {
       const result = await this.consumptionService.create(createConsumptionDto);
-      console.log({ result });
+
       return {
         message: 'Consumption added successfully',
         data: result,

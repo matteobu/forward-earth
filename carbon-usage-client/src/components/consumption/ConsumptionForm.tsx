@@ -88,7 +88,6 @@ export default function ConsumptionForm() {
                 id: selectedActivity.id,
                 name: selectedActivity.name,
                 emission_factor: selectedActivity.emission_factor,
-                activity_type_id: selectedActivity.id,
               }
             : null,
         }),

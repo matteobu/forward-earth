@@ -33,7 +33,6 @@ const ProductCatalogue: React.FC = () => {
 
       try {
         const data = await productsService.fetchAllProducts();
-        console.log(data);
         setProductsData(data);
       } catch (err) {
         const errorMessage =

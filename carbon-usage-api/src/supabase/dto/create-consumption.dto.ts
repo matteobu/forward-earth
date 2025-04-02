@@ -22,7 +22,7 @@ export class SupabaseConsumptionDto {
   @ApiProperty({ description: 'Activity type ID', example: 5 })
   @IsNotEmpty()
   @IsNumber()
-  activity_type_id: number;
+  activity_type_table_id: number;
 
   @ApiProperty({
     description: 'Activity name',
