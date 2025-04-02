@@ -5,7 +5,7 @@ import { UnitsService } from './units.service';
 export class UnitsController {
   constructor(private readonly unitsService: UnitsService) {}
 
-  // TODO: Give the user with admin role the authorization to add new Unit
+  // TOIMPROVE: Give the user with admin role the authorization to add new Unit
 
   @Get()
   findAll() {
