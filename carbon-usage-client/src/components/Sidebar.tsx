@@ -8,7 +8,6 @@ import {
   ShoppingBag,
   SquarePlus,
   TableProperties,
-  Users,
 } from 'lucide-react';
 import {
   NavItem,
@@ -99,14 +98,14 @@ export const NAV_ITEMS: NavItemOrDivider[] = [
     path: '/dashboard',
   },
   {
-    title: 'Insert Consumption',
-    icon: <SquarePlus size={20} className="text-gray-600" />,
-    path: '/dashboard/consumptions/new',
-  },
-  {
     title: 'Consumptions List',
     icon: <TableProperties size={20} className="text-gray-500" />,
     path: '/dashboard/consumptions/list',
+  },
+  {
+    title: 'Insert Consumption',
+    icon: <SquarePlus size={20} className="text-gray-600" />,
+    path: '/dashboard/consumptions/new',
   },
   {
     divider: true,
@@ -130,10 +129,5 @@ export const NAV_ITEMS: NavItemOrDivider[] = [
     title: 'Company Dashboard',
     icon: <Building2 size={20} className="text-gray-500" />,
     path: '/dashboard/company-dashboard',
-  },
-  {
-    title: 'Users',
-    icon: <Users size={20} className="text-red-500" />,
-    path: '/users',
   },
 ];
