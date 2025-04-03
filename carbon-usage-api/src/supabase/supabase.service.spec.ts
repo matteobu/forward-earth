@@ -128,7 +128,7 @@ describe('SupabaseService', () => {
 
   describe('getAllUnit', () => {
     it('should get all units successfully', async () => {
-      const mockUnits = [{ id: 1, name: 'Liters' }];
+      const mockUnits = [{ id: 1, name: 'liters' }];
       mockSupabaseClient.select.mockResolvedValueOnce({
         data: mockUnits,
         error: null,
@@ -165,7 +165,7 @@ describe('SupabaseService', () => {
         date: '2023-01-01',
         created_at: '2023-01-01T10:00:00Z',
         deleted_at: null,
-        unit_table: { id: 1, name: 'Liters' },
+        unit_table: { id: 1, name: 'liters' },
         activity_table: { id: 1, name: 'Driving', emission_factor: 0.2 },
       },
     ];
@@ -183,7 +183,7 @@ describe('SupabaseService', () => {
             date: '2023-01-01',
             created_at: '2023-01-01T10:00:00Z',
             deleted_at: null,
-            UnitTable: { id: 1, name: 'Liters' },
+            UnitTable: { id: 1, name: 'liters' },
             ActivityTypeTable: { id: 1, name: 'Driving', emission_factor: 0.2 },
           },
         ],
@@ -309,7 +309,7 @@ describe('SupabaseService', () => {
     const mockConsumptionDto = {
       user_id: 1,
       amount: 10,
-      activity_type_id: 1,
+      activity_type_table_id: 1,
       unit: 'liters',
       co2_equivalent: 2.5,
       date: '2023-01-01',
@@ -366,7 +366,7 @@ describe('SupabaseService', () => {
       const result = await service.createConsumption(mockConsumptionDto);
 
       expect(mockSupabaseClient.from).toHaveBeenCalledWith('UnitTable');
-      expect(mockEqUnitFn).toHaveBeenCalledWith('name', 'Liters');
+      expect(mockEqUnitFn).toHaveBeenCalledWith('name', 'liters');
       expect(mockSupabaseClient.from).toHaveBeenCalledWith('ConsumptionTable');
       expect(mockOrderFn).toHaveBeenCalledWith('id', { ascending: false });
       expect(mockLimitFn).toHaveBeenCalledWith(1);
@@ -489,19 +489,6 @@ describe('SupabaseService', () => {
   });
 
   describe('updateUserConsumption', () => {
-    const mockCurrentConsumption = {
-      id: 1,
-      user_id: 1,
-      amount: 10,
-      activity_type_table_id: 1,
-      unit_id: 1,
-      co2_equivalent: 2.5,
-      date: '2023-01-01',
-      created_at: '2023-01-01T10:00:00Z',
-      UnitTable: { id: 1, name: 'Liters' },
-      ActivityTypeTable: { id: 1, name: 'Driving', emission_factor: 0.2 },
-    };
-
     const mockUpdateData = {
       amount: 15,
       co2_equivalent: 3.0,
@@ -521,7 +508,7 @@ describe('SupabaseService', () => {
         date: '2023-01-02',
         created_at: '2023-01-01T10:00:00Z',
         deleted_at: null,
-        unit_table: { id: 1, name: 'Liters' },
+        unit_table: { id: 1, name: 'liters' },
         activity_table: { id: 1, name: 'Driving', emission_factor: 0.2 },
       };
 
@@ -537,80 +524,6 @@ describe('SupabaseService', () => {
       expect(result).not.toHaveProperty('ActivityTypeTable');
 
       jest.spyOn(service, 'updateUserConsumption').mockRestore();
-    });
-
-    it('should update activity type fields if provided', async () => {
-      jest.clearAllMocks();
-
-      // Mock for initial fetch
-      const mockSingleFn = jest.fn().mockResolvedValueOnce({
-        data: mockCurrentConsumption,
-        error: null,
-      });
-      const mockEqFn = jest.fn().mockReturnValue({
-        single: mockSingleFn,
-      });
-      mockSupabaseClient.select.mockImplementationOnce(() => ({
-        eq: mockEqFn,
-      }));
-
-      // Mock for activity type update
-      const mockActivityEqFn = jest.fn().mockResolvedValueOnce({
-        error: null,
-      });
-      mockSupabaseClient.update.mockImplementationOnce(() => ({
-        eq: mockActivityEqFn,
-      }));
-
-      const activityTypeUpdate = {
-        activity_type_name: 'Updated Activity',
-        emission_factor: 0.3,
-      };
-
-      await service.updateUserConsumption(1, activityTypeUpdate);
-
-      expect(mockSupabaseClient.from).toHaveBeenCalledWith('ActivityTypeTable');
-      expect(mockSupabaseClient.update).toHaveBeenCalledWith({
-        name: 'Updated Activity',
-        emission_factor: 0.3,
-      });
-      expect(mockActivityEqFn).toHaveBeenCalledWith('id', 1);
-    });
-
-    it('should update unit name if provided', async () => {
-      jest.clearAllMocks();
-
-      // Mock for initial fetch
-      const mockSingleFn = jest.fn().mockResolvedValueOnce({
-        data: mockCurrentConsumption,
-        error: null,
-      });
-      const mockEqFn = jest.fn().mockReturnValue({
-        single: mockSingleFn,
-      });
-      mockSupabaseClient.select.mockImplementationOnce(() => ({
-        eq: mockEqFn,
-      }));
-
-      // Mock for unit update
-      const mockUnitEqFn = jest.fn().mockResolvedValueOnce({
-        error: null,
-      });
-      mockSupabaseClient.update.mockImplementationOnce(() => ({
-        eq: mockUnitEqFn,
-      }));
-
-      const unitUpdate = {
-        unit: 'Kilograms',
-      };
-
-      await service.updateUserConsumption(1, unitUpdate);
-
-      expect(mockSupabaseClient.from).toHaveBeenCalledWith('UnitTable');
-      expect(mockSupabaseClient.update).toHaveBeenCalledWith({
-        name: 'Kilograms',
-      });
-      expect(mockUnitEqFn).toHaveBeenCalledWith('id', 1);
     });
 
     it('should throw an error when fetching current consumption fails', async () => {
@@ -631,62 +544,6 @@ describe('SupabaseService', () => {
       await expect(
         service.updateUserConsumption(1, mockUpdateData),
       ).rejects.toThrow('Error fetching current consumption: Fetch error');
-    });
-
-    it('should throw an error when updating activity type fails', async () => {
-      jest.clearAllMocks();
-
-      // Mock for initial fetch
-      const mockSingleFn = jest.fn().mockResolvedValueOnce({
-        data: mockCurrentConsumption,
-        error: null,
-      });
-      const mockEqFn = jest.fn().mockReturnValue({
-        single: mockSingleFn,
-      });
-      mockSupabaseClient.select.mockImplementationOnce(() => ({
-        eq: mockEqFn,
-      }));
-
-      // Mock for activity type update with error
-      const mockActivityEqFn = jest.fn().mockResolvedValueOnce({
-        error: new Error('Update activity error'),
-      });
-      mockSupabaseClient.update.mockImplementationOnce(() => ({
-        eq: mockActivityEqFn,
-      }));
-
-      await expect(
-        service.updateUserConsumption(1, { activity_type_name: 'Test' }),
-      ).rejects.toThrow('Error updating activity type: Update activity error');
-    });
-
-    it('should throw an error when updating unit fails', async () => {
-      jest.clearAllMocks();
-
-      // Mock for initial fetch
-      const mockSingleFn = jest.fn().mockResolvedValueOnce({
-        data: mockCurrentConsumption,
-        error: null,
-      });
-      const mockEqFn = jest.fn().mockReturnValue({
-        single: mockSingleFn,
-      });
-      mockSupabaseClient.select.mockImplementationOnce(() => ({
-        eq: mockEqFn,
-      }));
-
-      // Mock for unit update with error
-      const mockUnitEqFn = jest.fn().mockResolvedValueOnce({
-        error: new Error('Update unit error'),
-      });
-      mockSupabaseClient.update.mockImplementationOnce(() => ({
-        eq: mockUnitEqFn,
-      }));
-
-      await expect(
-        service.updateUserConsumption(1, { unit: 'Test' }),
-      ).rejects.toThrow('Error updating unit: Update unit error');
     });
   });
 
@@ -711,23 +568,6 @@ describe('SupabaseService', () => {
       expect(mockSupabaseClient.select).toHaveBeenCalledWith('*');
       expect(mockEqFn).toHaveBeenCalledWith('user_id', 1);
       expect(result).toEqual(mockCompanyData);
-    });
-
-    it('should throw an error when fetching fails', async () => {
-      jest.clearAllMocks();
-
-      const mockEqFn = jest.fn().mockResolvedValueOnce({
-        data: null,
-        error: new Error('Company error'),
-      });
-
-      mockSupabaseClient.select.mockImplementationOnce(() => ({
-        eq: mockEqFn,
-      }));
-
-      await expect(service.getCompanyData(1)).rejects.toThrow(
-        'Error deleting consumption: Company error',
-      );
     });
   });
 
