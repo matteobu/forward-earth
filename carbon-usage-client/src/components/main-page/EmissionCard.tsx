@@ -12,11 +12,6 @@ const EmissionTypeCard = ({
     name: '',
     percentage: 0,
   };
-  console.log(
-    hasSecondCategory,
-    topTwoEmissionCategory.length,
-    topTwoEmissionCategory
-  );
 
   return (
     <div className="relative bg-white rounded-xl shadow-lg p-6 border border-gray-100">

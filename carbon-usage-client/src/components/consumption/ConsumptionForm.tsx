@@ -6,8 +6,10 @@ import { useNavigate } from 'react-router-dom';
 import { ActivityType } from '@/utils/types';
 import { useUser } from '@/contexts/UserContext';
 import { useActivityTypeContext } from '@/contexts/ActivityTypeContext';
-import { ACTIVITY_CATEGORIES, getActivitiesByCategory } from '@/utils/utils';
+import { getActivitiesByCategory } from '@/utils/utils';
 import { consumptionService } from '@/services/consumptionService';
+import { ACTIVITY_CATEGORIES } from '@/utils/constants';
+import { CircleDot, Droplet, Factory, Plane, Trash2, Zap } from 'lucide-react';
 
 export default function ConsumptionForm() {
   const navigate = useNavigate();
@@ -92,19 +94,25 @@ export default function ConsumptionForm() {
     consumptionService.createConsumption(data, navigate, setIsSubmitting);
   };
 
-  // Get an icon for a category
   const getCategoryIcon = (category: string) => {
+    const iconProps = {
+      size: 20,
+      className: 'text-purple-500',
+    };
+
     switch (category) {
       case 'Energy':
-        return '⚡';
-      case 'Transportation':
-        return '✈️';
+        return <Zap {...iconProps} />;
+      case 'Transports':
+        return <Plane {...iconProps} />;
+      case 'Production':
+        return <Factory {...iconProps} />;
       case 'Waste & Materials':
-        return '🗑️';
+        return <Trash2 {...iconProps} />;
       case 'Water':
-        return '💧';
+        return <Droplet {...iconProps} />;
       default:
-        return '🔹';
+        return <CircleDot {...iconProps} />;
     }
   };
 
@@ -122,7 +130,7 @@ export default function ConsumptionForm() {
 
       <form onSubmit={handleSubmit} className="space-y-6">
         {/* Category Selection */}
-        <div className="grid grid-cols-1 md:grid-cols-5 gap-4 mb-6">
+        <div className="grid grid-cols-1 md:grid-cols-6 gap-4 mb-6">
           {Object.keys(ACTIVITY_CATEGORIES).map((category) => (
             <div
               key={category}

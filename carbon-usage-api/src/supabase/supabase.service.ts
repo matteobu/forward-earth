@@ -306,48 +306,6 @@ export class SupabaseService {
         );
       }
 
-      if (
-        patchConsumptionDto.activity_type_name ||
-        patchConsumptionDto.emission_factor
-      ) {
-        const updateFields: any = {};
-
-        if (patchConsumptionDto.activity_type_name) {
-          updateFields.name = patchConsumptionDto.activity_type_name;
-        }
-
-        if (patchConsumptionDto.emission_factor) {
-          updateFields.emission_factor = patchConsumptionDto.emission_factor;
-        }
-
-        if (Object.keys(updateFields).length > 0) {
-          const { error: updateError } = await this.supabase
-            .from('ActivityTypeTable')
-            .update(updateFields)
-            .eq('id', currentConsumption.activity_type_table_id);
-
-          if (updateError) {
-            throw new Error(
-              `Error updating activity type: ${updateError.message}`,
-            );
-          }
-        }
-      }
-
-      if (
-        patchConsumptionDto.unit &&
-        patchConsumptionDto.unit !== currentConsumption.UnitTable.name
-      ) {
-        const { error: updateError } = await this.supabase
-          .from('UnitTable')
-          .update({ name: patchConsumptionDto.unit })
-          .eq('id', currentConsumption.UnitTable.id);
-
-        if (updateError) {
-          throw new Error(`Error updating unit: ${updateError.message}`);
-        }
-      }
-
       const updateData: any = {};
 
       if (patchConsumptionDto.amount !== undefined) {

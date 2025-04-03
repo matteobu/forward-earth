@@ -8,6 +8,7 @@ import CategoryBreakdown from './CategoryBreakdown';
 import MonthlyTrend from './MonthlyTrend';
 import HighImpactActivitiesTable from './HighImpactActivitiesTable';
 import { useNavigate } from 'react-router-dom';
+import { ACTIVITY_CATEGORIES } from '@/utils/constants';
 
 const MainPage = () => {
   const { consumptions, dataChecked, isLoading } = useConsumptionData();
@@ -47,9 +48,10 @@ const MainPage = () => {
       {}
     );
 
-    Object.keys(categoryGroups).forEach((category) => {
+    const emissionsByCategory: Record<string, number> = {};
+    Object.entries(ACTIVITY_CATEGORIES).forEach(([category, activities]) => {
       emissionsByCategory[category] = 0;
-      categoryGroups[category].forEach((activityName) => {
+      activities.forEach((activityName) => {
         if (emissionsByActivityType[activityName]) {
           emissionsByCategory[category] +=
             emissionsByActivityType[activityName];
@@ -64,7 +66,6 @@ const MainPage = () => {
     if (total > categorizedEmissions) {
       emissionsByCategory['Other'] = total - categorizedEmissions;
     }
-
     // Convert to percentage and prepare for charts
     const categoryChartData = Object.keys(emissionsByCategory)
       .filter((key) => emissionsByCategory[key] > 0)
@@ -288,18 +289,3 @@ const MainPage = () => {
 };
 
 export default MainPage;
-
-// Process data for category breakdown
-const emissionsByCategory: Record<string, number> = {};
-const categoryGroups: Record<string, string[]> = {
-  'Procured goods and services': ['Office Paper Usage', 'Recycled Paper'],
-  Transportation: [
-    'Business Travel - Air (Short Haul)',
-    'Business Travel - Air (Long Haul)',
-    'Shipping - Road Freight',
-  ],
-  Refrigerants: ['Refrigerant R410A Leakage', 'Refrigerant R134a Leakage'],
-  Waste: ['Landfill Waste'],
-  Energy: ['Electricity', 'Natural Gas', 'Heating Oil'],
-  Water: ['Water Supply', 'Wastewater Treatment'],
-};
