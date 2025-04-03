@@ -39,7 +39,6 @@ const App: React.FC = () => {
               path="/dashboard/*"
               element={<ProtectedRoute element={<Dashboard />} />}
             />
-
             <Route path="*" element={<Navigate to="/" />} />
           </Routes>
         </Router>
