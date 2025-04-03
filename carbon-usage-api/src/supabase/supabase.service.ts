@@ -383,6 +383,136 @@ export class SupabaseService {
     // eslint-disable-next-line @typescript-eslint/no-unsafe-return
     return productsData;
   }
+
+  // ***
+  // PRODUCTION ROUTE
+  // ***
+  async getProductionData() {
+    const { data: productionData, error: productionError } = await this.supabase
+      .from('ProductionTable')
+      .select('*');
+
+    if (productionError) {
+      throw new Error(
+        `Error fetching production data: ${productionError.message}`,
+      );
+    }
+
+    if (!productionData || !Array.isArray(productionData)) {
+      throw new Error(
+        'Invalid data format: expected an array of production records',
+      );
+    }
+
+    const validatedData = productionData.map((record, index) => {
+      if (!record.id) {
+        console.warn(
+          `Record at index ${index} missing id, skipping validation`,
+        );
+        return {
+          id: record.id || '',
+          product_id: record.product_id || '',
+          batch_number: record.batch_number || '',
+          production_date: record.production_date || '',
+          total_units: record.total_units || 0,
+          production_efficiency: record.production_efficiency || 0,
+        };
+      }
+
+      const validRecord = {
+        id: this.validateField(record.id, 'id', ['string', 'number']),
+        product_id: this.validateField(record.product_id, 'product_id', [
+          'string',
+        ]),
+        batch_number: this.validateField(record.batch_number, 'batch_number', [
+          'string',
+        ]),
+        production_date: this.validateField(
+          record.production_date,
+          'production_date',
+          ['string'],
+        ),
+        total_units: this.validateField(record.total_units, 'total_units', [
+          'number',
+        ]),
+        production_efficiency: this.validateField(
+          record.production_efficiency,
+          'production_efficiency',
+          ['number'],
+        ),
+      };
+
+      if (
+        validRecord.production_efficiency < 0 ||
+        validRecord.production_efficiency > 1
+      ) {
+        console.warn(
+          `Record ${record.id}: production_efficiency outside valid range (0-1)`,
+        );
+        validRecord.production_efficiency = Math.max(
+          0,
+          Math.min(1, validRecord.production_efficiency),
+        );
+      }
+
+      if (validRecord.total_units < 0) {
+        console.warn(`Record ${record.id}: negative total_units, setting to 0`);
+        validRecord.total_units = 0;
+      }
+
+      return validRecord;
+    });
+
+    return validatedData;
+  }
+
+  private validateField(
+    value: any,
+    fieldName: string,
+    expectedTypes: string[],
+  ): any {
+    if (value === undefined || value === null) {
+      console.warn(`Missing required field: ${fieldName}`);
+      switch (expectedTypes[0]) {
+        case 'string':
+          return '';
+        case 'number':
+          return 0;
+        case 'boolean':
+          return false;
+        default:
+          return null;
+      }
+    }
+
+    const actualType = typeof value;
+    if (!expectedTypes.includes(actualType)) {
+      console.warn(
+        `Invalid type for ${fieldName}: expected ${expectedTypes.join(' or ')}, got ${actualType}`,
+      );
+
+      if (expectedTypes.includes('number') && actualType === 'string') {
+        const converted = Number(value);
+        if (!isNaN(converted)) return converted;
+      }
+      if (expectedTypes.includes('string')) {
+        return String(value);
+      }
+
+      switch (expectedTypes[0]) {
+        case 'string':
+          return '';
+        case 'number':
+          return 0;
+        case 'boolean':
+          return false;
+        default:
+          return null;
+      }
+    }
+
+    return value;
+  }
 }
 
 function isConsumptionArray(data: any): data is Consumption[] {
