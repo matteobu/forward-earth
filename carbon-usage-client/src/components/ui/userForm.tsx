@@ -22,6 +22,7 @@ const UserForm = ({
     };
 
     try {
+      // TODO: Move this to services/authService.ts
       const response = await fetch('http://localhost:3000/auth/login', {
         method: 'POST',
         credentials: 'include',
@@ -53,6 +54,7 @@ const UserForm = ({
 
   const handleLogout = async () => {
     try {
+      // TODO: Move this to services/authService.ts
       const response = await fetch('http://localhost:3000/users/logout', {
         method: 'POST',
         credentials: 'include',

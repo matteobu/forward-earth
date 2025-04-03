@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
+import { loginService } from '@/services/loginService';
 
 const LoginForm: React.FC = () => {
   const [name, setName] = useState('');
@@ -12,29 +13,14 @@ const LoginForm: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsLoading(true);
-    setError('');
-
-    try {
-      const response = await fetch('http://localhost:3000/auth/login', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, name }),
-        credentials: 'include',
-      });
-
-      if (!response.ok) {
-        throw new Error('Login failed');
-      }
-
-      login();
-      navigate('/dashboard');
-    } catch (error) {
-      console.error('Login failed', error);
-      setError('Login failed. Please check your credentials and try again.');
-    } finally {
-      setIsLoading(false);
-    }
+    await loginService.fetchLoginAuth(
+      name,
+      email,
+      setIsLoading,
+      setError,
+      login,
+      navigate
+    );
   };
 
   return (

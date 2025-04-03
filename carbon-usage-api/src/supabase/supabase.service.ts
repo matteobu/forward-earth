@@ -212,10 +212,6 @@ export class SupabaseService {
   }
 
   async createConsumption(consumptionData: SupabaseConsumptionDto) {
-    // FIXME: Here the table has Liters instead of liters
-    consumptionData.unit =
-      consumptionData.unit === 'liters' ? 'Liters' : consumptionData.unit;
-
     const { data: unitData, error: unitError } = await this.supabase
       .from('UnitTable')
       .select('id')
@@ -259,6 +255,7 @@ export class SupabaseService {
     if (error) {
       throw new Error(`Error creating consumption: ${error.message}`);
     }
+
     return data[0] as {
       id: number;
       user_id: number;

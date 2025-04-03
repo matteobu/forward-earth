@@ -7,6 +7,7 @@ import { ActivityType } from '@/utils/types';
 import { useUser } from '@/contexts/UserContext';
 import { useActivityTypeContext } from '@/contexts/ActivityTypeContext';
 import { ACTIVITY_CATEGORIES, getActivitiesByCategory } from '@/utils/utils';
+import { consumptionService } from '@/services/consumptionService';
 
 export default function ConsumptionForm() {
   const navigate = useNavigate();
@@ -66,43 +67,29 @@ export default function ConsumptionForm() {
     e.preventDefault();
     setIsSubmitting(true);
 
-    try {
-      const response = await fetch('http://localhost:3000/consumption/create', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          user_id: userContext.userId,
-          amount: parseFloat(formData.amount),
-          activity_type_table_id: parseInt(formData.activity_type_table_id),
-          date: formData.date,
-          co2_equivalent: co2Impact,
-          unit_id: selectedActivity ? selectedActivity.id : null,
-          unit_table: selectedActivity
-            ? {
-                id: selectedActivity.id,
-                name: selectedActivity.unit,
-              }
-            : null,
-          activity_table: selectedActivity
-            ? {
-                id: selectedActivity.id,
-                name: selectedActivity.name,
-                emission_factor: selectedActivity.emission_factor,
-              }
-            : null,
-        }),
-        credentials: 'include',
-      });
+    const data = {
+      user_id: userContext.userId,
+      amount: parseFloat(formData.amount),
+      activity_type_table_id: parseInt(formData.activity_type_table_id),
+      date: formData.date,
+      co2_equivalent: co2Impact,
+      unit_id: selectedActivity ? selectedActivity.id : null,
+      unit_table: selectedActivity
+        ? {
+            id: selectedActivity.id,
+            name: selectedActivity.unit,
+          }
+        : null,
+      activity_table: selectedActivity
+        ? {
+            id: selectedActivity.id,
+            name: selectedActivity.name,
+            emission_factor: selectedActivity.emission_factor,
+          }
+        : null,
+    };
 
-      if (!response.ok) {
-        throw new Error(`Error: ${response.status}`);
-      }
-
-      navigate('/dashboard/consumptions/list');
-    } catch (error) {
-      console.error('Failed to create consumption', error);
-      setIsSubmitting(false);
-    }
+    consumptionService.createConsumption(data, navigate, setIsSubmitting);
   };
 
   // Get an icon for a category
