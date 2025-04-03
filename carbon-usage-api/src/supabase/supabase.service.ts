@@ -42,6 +42,7 @@ export class SupabaseService {
     return data as User;
   }
 
+  // TOIMPROVE: Not implemented now
   async createUser(name: string, email: string) {
     const { data, error } = await this.supabase
       .from('Users')
