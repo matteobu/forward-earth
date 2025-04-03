@@ -1,5 +1,6 @@
 // services/consumptionService.ts
 import { ConsumptionPatchPayload } from '@/utils/types';
+import { NavigateFunction } from 'react-router-dom';
 
 const API_BASE_URL = 'http://localhost:3000';
 
@@ -99,23 +100,38 @@ export const consumptionService = {
   },
 
   // Creates a new consumption record in the database
-  createConsumption: async (data: {
-    userId: number;
-    amount: number;
-    date: string;
-    activityType: number;
-  }) => {
-    const response = await fetch(`${API_BASE_URL}/consumption/create`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(data),
-      credentials: 'include',
-    });
+  createConsumption: async (
+    data: {
+      user_id: number;
+      amount: number;
+      activity_type_table_id: number;
+      date: string;
+      co2_equivalent: number | null;
+      unit_id: number | null;
+      unit_table: {
+        id: number;
+        name: string | undefined;
+      } | null;
+    },
+    navigate: NavigateFunction,
+    setIsSubmitting: (value: React.SetStateAction<boolean>) => void
+  ) => {
+    try {
+      const response = await fetch('http://localhost:3000/consumption/create', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data),
+        credentials: 'include',
+      });
 
-    if (!response.ok) {
-      throw new Error(`Error: ${response.status}`);
+      if (!response.ok) {
+        throw new Error(`Error: ${response.status}`);
+      }
+
+      navigate('/dashboard/consumptions/list');
+    } catch (error) {
+      console.error('Failed to create consumption', error);
+      setIsSubmitting(false);
     }
-
-    return await response.json();
   },
 };
