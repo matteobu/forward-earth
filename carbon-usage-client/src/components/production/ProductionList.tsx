@@ -1,5 +1,7 @@
-import React, { useState } from 'react';
+/* eslint-disable @typescript-eslint/no-unused-vars */
+import React, { useEffect, useState } from 'react';
 import { formatNumber } from '@/utils/utils';
+import { productionService } from '@/services/productionService';
 
 interface ProductionRecord {
   id: number;
@@ -10,19 +12,23 @@ interface ProductionRecord {
   production_efficiency: number;
 }
 
-// TOIMPROVE: Here we could improve the component with a api call to the backend to provide real time data from a database.
-
 const ProductionTable: React.FC = () => {
   const [currentPage, setCurrentPage] = useState(1);
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
+  const [productionData, setProductionData] = useState<ProductionRecord[]>([]);
   const itemsPerPage = 20;
 
-  const productionData: ProductionRecord[] = productionDataMock;
-  const totalPages = Math.ceil(productionData.length / itemsPerPage);
+  const totalPages = productionData?.length
+    ? Math.ceil(productionData.length / itemsPerPage)
+    : 0;
 
-  const paginatedData = productionData.slice(
-    (currentPage - 1) * itemsPerPage,
-    currentPage * itemsPerPage
-  );
+  const paginatedData = productionData?.length
+    ? productionData.slice(
+        (currentPage - 1) * itemsPerPage,
+        currentPage * itemsPerPage
+      )
+    : [];
 
   const goToNextPage = () => {
     if (currentPage < totalPages) {
@@ -35,6 +41,30 @@ const ProductionTable: React.FC = () => {
       setCurrentPage(currentPage - 1);
     }
   };
+
+  useEffect(() => {
+    const fetchData = async () => {
+      setLoading(true);
+
+      try {
+        const data = await productionService.fetchAllProductionBatches();
+
+        setProductionData(data);
+      } catch (err) {
+        const errorMessage =
+          err instanceof Error
+            ? err.message
+            : 'An unexpected error occurred while fetching company data';
+
+        setError(errorMessage);
+        console.error('Error fetching company data:', err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchData();
+  }, []);
 
   return (
     <div className="bg-white rounded-xl shadow-lg p-6 mb-6">
