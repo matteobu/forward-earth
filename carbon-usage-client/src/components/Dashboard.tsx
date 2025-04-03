@@ -10,6 +10,7 @@ import MainPage from './main-page/MainPage';
 import ConsumptionDataCollection from './consumption/ConsumptionDataCollection';
 import ProductsCatalogue from './products-catalogue/ProductsCatalogue';
 import CompanyDashboard from './company/CompanyDashboard';
+import ProductionTable from './production/ProductionList';
 
 export default function Dashboard() {
   const { logout } = useAuth();
@@ -52,6 +53,7 @@ export default function Dashboard() {
                 path="products-catalogue"
                 element={<ProductsCatalogue />}
               />
+              <Route path="production/list" element={<ProductionTable />} />
               <Route path="company-dashboard" element={<CompanyDashboard />} />
             </Routes>
           </ActivityTypeProvider>

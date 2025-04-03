@@ -117,9 +117,9 @@ export const NAV_ITEMS: NavItemOrDivider[] = [
     path: '/dashboard/products-catalogue',
   },
   {
-    title: 'PCF assessment',
-    icon: <FileText size={20} className="text-red-500" />,
-    path: '/pcf-assessment',
+    title: 'Production List',
+    icon: <FileText size={20} className="text-gray-500" />,
+    path: '/dashboard/production/list',
   },
   {
     divider: true,
