@@ -1,3 +1,4 @@
+import { ACTIVITY_CATEGORIES } from './constants';
 import { ActivityType, Consumption } from './types';
 
 /**
@@ -51,30 +52,6 @@ export const formatNumber = (num: number) => {
   const numStr = num.toFixed(1);
   const [intPart, decPart] = numStr.split('.');
   return `${intPart.replace(/\B(?=(\d{3})+(?!\d))/g, '.')},${decPart}`;
-};
-
-// Group activities by category for better organization
-export const ACTIVITY_CATEGORIES = {
-  Energy: ['Electricity', 'Natural Gas', 'Heating Oil'],
-  Transportation: [
-    'Business Travel - Air',
-    'Business Travel - Rail',
-    'Company Vehicles',
-    'Shipping',
-  ],
-  'Waste & Materials': [
-    'Landfill Waste',
-    'Recycled Paper',
-    'Recycled Plastic',
-    'Office Paper Usage',
-  ],
-  Water: ['Water Supply', 'Wastewater Treatment'],
-  Other: [
-    'Refrigerant Leakage',
-    'Data Center Usage',
-    'Cloud Services',
-    'Employee Remote Work',
-  ],
 };
 
 // Find category for a specific activity type
