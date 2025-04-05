@@ -44,7 +44,7 @@ npm run start:dev
 
 ### Environment Setup
 
-Create an `.env.local` file in the root directory with the following configuration:
+Create an `.env` file in the root directory with the following configuration:
 
 ```
 # Supabase Configuration
