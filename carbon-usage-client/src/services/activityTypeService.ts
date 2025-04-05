@@ -1,11 +1,9 @@
-const API_BASE_URL = 'http://localhost:3000';
+import { API_ENDPOINTS } from '@/utils/endpoints';
 
 export const activityTypeService = {
   fetchAllActivityType: async () => {
-    const url = `${API_BASE_URL}/activity-types/`;
-
     try {
-      const response = await fetch(url, {
+      const response = await fetch(API_ENDPOINTS.ACTIVITY_TYPES, {
         credentials: 'include',
       });
 

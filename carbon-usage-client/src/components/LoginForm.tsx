@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { useAuth } from '../contexts/AuthContext';
 import { useNavigate } from 'react-router-dom';
-import { loginService } from '@/services/loginService';
+import { authService } from '@/services/authService';
 
 const LoginForm: React.FC = () => {
   const [name, setName] = useState('');
@@ -13,7 +13,7 @@ const LoginForm: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    await loginService.fetchLoginAuth(
+    await authService.fetchLoginAuth(
       name,
       email,
       setIsLoading,

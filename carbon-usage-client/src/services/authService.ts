@@ -1,9 +1,10 @@
-const API_BASE_URL = 'http://localhost:3000';
+import { API_ENDPOINTS } from '@/utils/endpoints';
+import { NavigateFunction } from 'react-router-dom';
 
 export const authService = {
   authUser: async () => {
     try {
-      const response = await fetch(`${API_BASE_URL}/auth/me`, {
+      const response = await fetch(API_ENDPOINTS.AUTH_USER, {
         credentials: 'include',
       });
 
@@ -19,9 +20,40 @@ export const authService = {
     }
   },
 
+  fetchLoginAuth: async (
+    name: string,
+    email: string,
+    setIsLoading: React.Dispatch<React.SetStateAction<boolean>>,
+    setError: React.Dispatch<React.SetStateAction<string>>,
+    login: () => Promise<void>,
+    navigate: NavigateFunction
+  ) => {
+
+    try {
+      const response = await fetch(API_ENDPOINTS.AUTH_LOGIN, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, name }),
+        credentials: 'include',
+      });
+
+      if (!response.ok) {
+        throw new Error('Login failed');
+      }
+
+      login();
+      navigate('/dashboard');
+    } catch (error) {
+      console.error('Login failed', error);
+      setError('Login failed. Please check your credentials and try again.');
+    } finally {
+      setIsLoading(false);
+    }
+  },
+
   logout: async () => {
     try {
-      const response = await fetch(`${API_BASE_URL}/auth/logout`, {
+      const response = await fetch(API_ENDPOINTS.AUTH_LOGOUT, {
         method: 'POST',
         credentials: 'include',
       });

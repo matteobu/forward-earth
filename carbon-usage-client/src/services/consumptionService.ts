@@ -1,7 +1,6 @@
+import { API_ENDPOINTS } from '@/utils/endpoints';
 import { ConsumptionPatchPayload } from '@/utils/types';
 import { NavigateFunction } from 'react-router-dom';
-
-const API_BASE_URL = 'http://localhost:3000';
 
 export const consumptionService = {
   fetchConsumptions: async (params: {
@@ -29,7 +28,7 @@ export const consumptionService = {
       activityType,
     } = params;
 
-    let url = `${API_BASE_URL}/consumption/${userId}`;
+    let url = `${API_ENDPOINTS.CONSUMPTION}${userId}`;
     const queryParams = new URLSearchParams();
 
     if (page) queryParams.append('page', page.toString());
@@ -68,7 +67,7 @@ export const consumptionService = {
   },
 
   updateConsumption: async (id: number, data: ConsumptionPatchPayload) => {
-    const response = await fetch(`${API_BASE_URL}/consumption/patch/${id}`, {
+    const response = await fetch(`${API_ENDPOINTS.CONSUMPTION_PATCH}${id}`, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(data),
@@ -83,7 +82,7 @@ export const consumptionService = {
   },
 
   deleteConsumption: async (id: number) => {
-    const response = await fetch(`${API_BASE_URL}/consumption/delete/${id}`, {
+    const response = await fetch(`${API_ENDPOINTS.CONSUMPTION_DELETE}${id}`, {
       method: 'DELETE',
       credentials: 'include',
     });
