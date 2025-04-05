@@ -1,4 +1,4 @@
-import { API_ENDPOINTS } from '@/utils/endpoints';
+import { API_ENDPOINTS } from '../utils/endpoints';
 import { NavigateFunction } from 'react-router-dom';
 
 export const authService = {
@@ -28,7 +28,6 @@ export const authService = {
     login: () => Promise<void>,
     navigate: NavigateFunction
   ) => {
-
     try {
       const response = await fetch(API_ENDPOINTS.AUTH_LOGIN, {
         method: 'POST',

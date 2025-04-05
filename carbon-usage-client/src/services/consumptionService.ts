@@ -1,4 +1,4 @@
-import { API_ENDPOINTS } from '@/utils/endpoints';
+import { API_ENDPOINTS } from '../utils/endpoints';
 import { ConsumptionPatchPayload } from '@/utils/types';
 import { NavigateFunction } from 'react-router-dom';
 

@@ -1,4 +1,4 @@
-import { API_ENDPOINTS } from '@/utils/endpoints';
+import { API_ENDPOINTS } from '../utils/endpoints';
 
 export const productionService = {
   fetchAllProductionBatches: async () => {
