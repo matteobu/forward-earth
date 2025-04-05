@@ -6,7 +6,6 @@ import { User } from './entities/user.entity';
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
-  // Get user information by ID
   @Get(':id')
   async getUserInfo(@Param('id') userId: string) {
     const user: User = await this.usersService.getUserInfoById(userId);

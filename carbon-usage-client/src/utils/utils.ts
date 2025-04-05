@@ -54,7 +54,6 @@ export const formatNumber = (num: number) => {
   return `${intPart.replace(/\B(?=(\d{3})+(?!\d))/g, '.')},${decPart}`;
 };
 
-// Find category for a specific activity type
 export const getCategoryForActivity = (activityName: string): string => {
   for (const [category, activities] of Object.entries(ACTIVITY_CATEGORIES)) {
     if (activities.some((activity) => activityName.includes(activity))) {
@@ -64,7 +63,6 @@ export const getCategoryForActivity = (activityName: string): string => {
   return 'Other';
 };
 
-// Get activities by category
 export const getActivitiesByCategory = (
   category: string,
   activityTypes: ActivityType[]

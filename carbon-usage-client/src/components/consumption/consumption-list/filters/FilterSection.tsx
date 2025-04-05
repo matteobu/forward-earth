@@ -1,4 +1,3 @@
-// FilterSection.tsx
 import { useActivityTypeContext } from '@/contexts/ActivityTypeContext';
 import React from 'react';
 import { Popover, PopoverButton, PopoverPanel } from '@headlessui/react';
@@ -63,7 +62,6 @@ const FilterSection: React.FC<FilterSectionProps> = ({
     }
   };
 
-  // Handle CO2 impact filter changes
   const handleCO2Change = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     const numValue = value === '' ? null : Number(value);
@@ -75,13 +73,11 @@ const FilterSection: React.FC<FilterSectionProps> = ({
     }
   };
 
-  // Handle activity type filter changes
   const handleActivityChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const value = e.target.value;
     onActivityFilterChange(value === '' ? null : Number(value));
   };
 
-  // Format date for display
   const formatDate = (date: Date | null) => {
     if (!date) return '';
     return date.toLocaleDateString('en-US', {

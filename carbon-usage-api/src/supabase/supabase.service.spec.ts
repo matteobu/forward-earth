@@ -316,10 +316,8 @@ describe('SupabaseService', () => {
     };
 
     it('should create a consumption entry successfully', async () => {
-      // Reset mocks
       jest.clearAllMocks();
 
-      // Mock for UnitTable.select().eq()
       const mockEqUnitFn = jest.fn().mockResolvedValueOnce({
         data: [{ id: 2 }],
         error: null,
@@ -328,7 +326,6 @@ describe('SupabaseService', () => {
         eq: mockEqUnitFn,
       }));
 
-      // Mock for ConsumptionTable.select().order().limit().single()
       const mockSingleFn = jest.fn().mockResolvedValueOnce({
         data: { id: 10 },
         error: null,
@@ -343,7 +340,6 @@ describe('SupabaseService', () => {
         order: mockOrderFn,
       }));
 
-      // Mock for final selection after insert
       const mockSelectFn = jest.fn().mockResolvedValueOnce({
         data: [
           {
@@ -392,7 +388,6 @@ describe('SupabaseService', () => {
     it('should throw an error when last record fetch fails', async () => {
       jest.clearAllMocks();
 
-      // Mock for UnitTable.select().eq()
       const mockEqUnitFn = jest.fn().mockResolvedValueOnce({
         data: [{ id: 2 }],
         error: null,
@@ -401,7 +396,6 @@ describe('SupabaseService', () => {
         eq: mockEqUnitFn,
       }));
 
-      // Mock for ConsumptionTable.select().order().limit().single() with error
       const mockSingleFn = jest.fn().mockResolvedValueOnce({
         data: null,
         error: new Error('Last record error'),
@@ -424,7 +418,6 @@ describe('SupabaseService', () => {
     it('should throw an error when insertion fails', async () => {
       jest.clearAllMocks();
 
-      // Mock for UnitTable.select().eq()
       const mockEqUnitFn = jest.fn().mockResolvedValueOnce({
         data: [{ id: 2 }],
         error: null,
@@ -433,7 +426,6 @@ describe('SupabaseService', () => {
         eq: mockEqUnitFn,
       }));
 
-      // Mock for ConsumptionTable.select().order().limit().single()
       const mockSingleFn = jest.fn().mockResolvedValueOnce({
         data: { id: 10 },
         error: null,
@@ -448,7 +440,6 @@ describe('SupabaseService', () => {
         order: mockOrderFn,
       }));
 
-      // Mock for final selection after insert with error
       const mockSelectFn = jest.fn().mockResolvedValueOnce({
         data: null,
         error: new Error('Insert error'),
@@ -529,7 +520,6 @@ describe('SupabaseService', () => {
     it('should throw an error when fetching current consumption fails', async () => {
       jest.clearAllMocks();
 
-      // Mock for initial fetch with error
       const mockSingleFn = jest.fn().mockResolvedValueOnce({
         data: null,
         error: new Error('Fetch error'),

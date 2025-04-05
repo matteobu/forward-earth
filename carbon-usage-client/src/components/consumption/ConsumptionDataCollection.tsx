@@ -1,7 +1,6 @@
 import React from 'react';
 import { useConsumptionData } from '@/hooks/useConsumptionData';
 
-// Definizione dei gruppi di categorie
 const categoryGroups: Record<string, string[]> = {
   'Procured goods and services': ['Office Paper Usage', 'Recycled Paper'],
   Transportation: [
@@ -36,7 +35,6 @@ const ConsumptionDataCollection: React.FC = () => {
     calculateTotalCO2,
   } = useConsumptionData();
 
-  // Preparazione delle opzioni per i filtri di attività
   const activityOptions = Object.values(categoryGroups).flat();
 
   return (
@@ -45,7 +43,7 @@ const ConsumptionDataCollection: React.FC = () => {
         Carbon Emissions Data Collection
       </h2>
 
-      {/* Filtri */}
+      {/* Filter */}
       <div className="mb-6 grid grid-cols-1 md:grid-cols-3 gap-4">
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -91,7 +89,7 @@ const ConsumptionDataCollection: React.FC = () => {
         </div>
       </div>
 
-      {/* Bottone per cancellare filtri */}
+      {/* Cancel Filter Btn */}
       <div className="mb-4">
         <button
           onClick={clearFilters}
@@ -101,7 +99,7 @@ const ConsumptionDataCollection: React.FC = () => {
         </button>
       </div>
 
-      {/* Tabella dei consumi */}
+      {/* Consumptions Table */}
       {isLoading ? (
         <div className="text-center py-6">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-500 mx-auto"></div>
@@ -156,7 +154,6 @@ const ConsumptionDataCollection: React.FC = () => {
             </table>
           </div>
 
-          {/* Totale e statistiche */}
           <div className="mt-4 flex justify-between items-center">
             <div>
               <span className="text-gray-600">
@@ -164,7 +161,6 @@ const ConsumptionDataCollection: React.FC = () => {
               </span>
             </div>
 
-            {/* Controlli di paginazione */}
             <div className="flex items-center space-x-2">
               <select
                 value={itemsPerPage}

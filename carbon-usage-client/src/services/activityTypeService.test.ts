@@ -1,4 +1,3 @@
-// Tests for activityTypeService API interactions with proper mocking of fetch requests
 import { activityTypeService } from './activityTypeService';
 import fetchMock from 'jest-fetch-mock';
 fetchMock.enableMocks();

@@ -66,7 +66,6 @@ const MainPage = () => {
     if (total > categorizedEmissions) {
       emissionsByCategory['Other'] = total - categorizedEmissions;
     }
-    // Convert to percentage and prepare for charts
     const categoryChartData = Object.keys(emissionsByCategory)
       .filter((key) => emissionsByCategory[key] > 0)
       .map((key) => ({
@@ -101,7 +100,6 @@ const MainPage = () => {
 
     setMonthlySummary(monthlyChartData);
 
-    // Find highest impact activities
     const sortedActivities = [...consumptions]
       .sort((a, b) => b.co2_equivalent - a.co2_equivalent)
       .slice(0, 5);

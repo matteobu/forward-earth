@@ -51,12 +51,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
     try {
       await authService.logout();
 
-      // Additional client-side actions after logout
       setUser(null);
       setIsAuthenticated(false);
       window.location.href = '/login';
     } catch (error) {
-      // Optional: Handle any additional errors or UI feedback
       console.error('Error during logout:', error);
     }
   };

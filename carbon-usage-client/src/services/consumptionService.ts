@@ -1,11 +1,9 @@
-// services/consumptionService.ts
 import { ConsumptionPatchPayload } from '@/utils/types';
 import { NavigateFunction } from 'react-router-dom';
 
 const API_BASE_URL = 'http://localhost:3000';
 
 export const consumptionService = {
-  // Retrieves user consumption data with support for pagination, sorting, and filtering
   fetchConsumptions: async (params: {
     userId: number;
     page?: number;
@@ -69,7 +67,6 @@ export const consumptionService = {
     return JSON.parse(text);
   },
 
-  // Updates an existing consumption record with partial data
   updateConsumption: async (id: number, data: ConsumptionPatchPayload) => {
     const response = await fetch(`${API_BASE_URL}/consumption/patch/${id}`, {
       method: 'PATCH',
@@ -85,7 +82,6 @@ export const consumptionService = {
     return await response.json();
   },
 
-  // Permanently removes a consumption record from the database
   deleteConsumption: async (id: number) => {
     const response = await fetch(`${API_BASE_URL}/consumption/delete/${id}`, {
       method: 'DELETE',
@@ -99,7 +95,6 @@ export const consumptionService = {
     return true;
   },
 
-  // Creates a new consumption record in the database
   createConsumption: async (
     data: {
       user_id: number;

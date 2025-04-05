@@ -1,4 +1,3 @@
-// components/consumption/ui/ConsumptionHeader.tsx
 import { CircleX, FilePlus2, ListFilter } from 'lucide-react';
 import React from 'react';
 import { useNavigate } from 'react-router-dom';

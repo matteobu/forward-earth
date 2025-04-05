@@ -8,7 +8,6 @@ describe('loginService', () => {
   const mockEmail = 'test@example.com';
   const mockName = 'Test User';
 
-  // Mock functions to simulate React state setters and navigation
   const mockSetIsLoading = jest.fn();
   const mockSetError = jest.fn();
   const mockLogin = jest.fn();
@@ -20,7 +19,6 @@ describe('loginService', () => {
   });
 
   it('should successfully login and navigate to dashboard', async () => {
-    // Mock a successful login response
     fetchMock.mockResponseOnce(JSON.stringify({}), { status: 200 });
 
     await loginService.fetchLoginAuth(
@@ -32,7 +30,6 @@ describe('loginService', () => {
       mockNavigate
     );
 
-    // Verify fetch was called with correct parameters
     expect(fetchMock).toHaveBeenCalledWith('http://localhost:3000/auth/login', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -40,7 +37,6 @@ describe('loginService', () => {
       credentials: 'include',
     });
 
-    // Verify subsequent actions
     expect(mockLogin).toHaveBeenCalled();
     expect(mockNavigate).toHaveBeenCalledWith('/dashboard');
     expect(mockSetIsLoading).toHaveBeenCalledWith(false);
@@ -48,10 +44,8 @@ describe('loginService', () => {
   });
 
   it('should handle login failure', async () => {
-    // Mock a failed login response
     fetchMock.mockResponseOnce('', { status: 401 });
 
-    // Spy on console.error to prevent actual error logging
     const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation();
 
     await loginService.fetchLoginAuth(
@@ -63,7 +57,6 @@ describe('loginService', () => {
       mockNavigate
     );
 
-    // Verify error handling
     expect(mockSetError).toHaveBeenCalledWith(
       'Login failed. Please check your credentials and try again.'
     );
@@ -71,15 +64,12 @@ describe('loginService', () => {
     expect(mockNavigate).not.toHaveBeenCalled();
     expect(mockSetIsLoading).toHaveBeenCalledWith(false);
 
-    // Restore console.error
     consoleErrorSpy.mockRestore();
   });
 
   it('should handle network errors', async () => {
-    // Mock a network error
     fetchMock.mockReject(new Error('Network error'));
 
-    // Spy on console.error to prevent actual error logging
     const consoleErrorSpy = jest.spyOn(console, 'error').mockImplementation();
 
     await loginService.fetchLoginAuth(
@@ -91,7 +81,6 @@ describe('loginService', () => {
       mockNavigate
     );
 
-    // Verify error handling
     expect(mockSetError).toHaveBeenCalledWith(
       'Login failed. Please check your credentials and try again.'
     );
@@ -99,7 +88,6 @@ describe('loginService', () => {
     expect(mockNavigate).not.toHaveBeenCalled();
     expect(mockSetIsLoading).toHaveBeenCalledWith(false);
 
-    // Restore console.error
     consoleErrorSpy.mockRestore();
   });
 });
