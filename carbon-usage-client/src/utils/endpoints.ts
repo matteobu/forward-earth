@@ -13,3 +13,16 @@ export const API_ENDPOINTS = {
   PRODUCTS: `${BASE_URL}/products/`,
   UNITS: `${BASE_URL}/units/`,
 };
+
+export const URL_ENDPOINTS = {
+  ROOT: '/',
+  ANY: '*',
+  LOGIN: '/login',
+  DASHBOARD: '/dashboard',
+  DASHBOARD_NESTED: '/dashboard/*',
+  COMPANY_DASHBOARD: '/company-dashboard',
+  CONSUMPTION_NEW: '/consumptions/new',
+  CONSUMPTION_LIST: '/consumptions/list',
+  PRODUCTS_CATALOGUE: '/products-catalogue/',
+  PRODUCTION_LIST: '/production/list',
+};

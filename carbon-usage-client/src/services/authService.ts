@@ -1,4 +1,4 @@
-import { API_ENDPOINTS } from '../utils/endpoints';
+import { API_ENDPOINTS, URL_ENDPOINTS } from '../utils/endpoints';
 import { NavigateFunction } from 'react-router-dom';
 
 export const authService = {
@@ -41,7 +41,7 @@ export const authService = {
       }
 
       login();
-      navigate('/dashboard');
+      navigate(URL_ENDPOINTS.DASHBOARD);
     } catch (error) {
       console.error('Login failed', error);
       setError('Login failed. Please check your credentials and try again.');

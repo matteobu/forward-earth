@@ -9,6 +9,7 @@ import MonthlyTrend from './MonthlyTrend';
 import HighImpactActivitiesTable from './HighImpactActivitiesTable';
 import { useNavigate } from 'react-router-dom';
 import { ACTIVITY_CATEGORIES } from '@/utils/constants';
+import { URL_ENDPOINTS } from '@/utils/endpoints';
 
 const MainPage = () => {
   const { consumptions, dataChecked, isLoading } = useConsumptionData();
@@ -120,7 +121,7 @@ const MainPage = () => {
 
     if (dataChecked && consumptions.length === 0) {
       timeoutId = setTimeout(() => {
-        navigate('/add-consumption');
+        navigate(URL_ENDPOINTS.DASHBOARD + URL_ENDPOINTS.CONSUMPTION_NEW);
       }, 5000);
     }
 
@@ -175,7 +176,9 @@ const MainPage = () => {
             It looks like you haven't added any carbon consumption entries yet.
           </p>
           <button
-            onClick={() => navigate('/dashboard/consumptions/new')}
+            onClick={() =>
+              navigate(URL_ENDPOINTS.DASHBOARD + URL_ENDPOINTS.CONSUMPTION_NEW)
+            }
             className="bg-blue-500 text-white px-6 py-3 rounded-lg hover:bg-blue-600 transition-colors"
           >
             Add First Entry

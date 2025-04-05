@@ -1,4 +1,4 @@
-import { API_ENDPOINTS } from '../utils/endpoints';
+import { API_ENDPOINTS, URL_ENDPOINTS } from '../utils/endpoints';
 import { ConsumptionPatchPayload } from '@/utils/types';
 import { NavigateFunction } from 'react-router-dom';
 
@@ -122,7 +122,7 @@ export const consumptionService = {
         throw new Error(`Error: ${response.status}`);
       }
 
-      navigate('/dashboard/consumptions/list');
+      navigate(URL_ENDPOINTS.DASHBOARD + URL_ENDPOINTS.CONSUMPTION_LIST);
     } catch (error) {
       console.error('Failed to create consumption', error);
       setIsSubmitting(false);

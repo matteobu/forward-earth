@@ -1,6 +1,7 @@
 import { useAuth } from '@/contexts/AuthContext';
 import { Navigate } from 'react-router-dom';
 import LoginForm from './LoginForm';
+import { URL_ENDPOINTS } from '@/utils/endpoints';
 
 export const AuthRedirect = () => {
   const { isAuthenticated, loading } = useAuth();
@@ -13,5 +14,9 @@ export const AuthRedirect = () => {
     );
   }
 
-  return isAuthenticated ? <Navigate to="/dashboard" /> : <LoginForm />;
+  return isAuthenticated ? (
+    <Navigate to={URL_ENDPOINTS.DASHBOARD} />
+  ) : (
+    <LoginForm />
+  );
 };

@@ -11,6 +11,7 @@ import { AuthProvider } from './contexts/AuthContext';
 import { UserProvider } from './contexts/UserContext';
 import ProtectedRoute from './components/ProtectedRoute';
 import { AuthRedirect } from './components/AuthRedirect';
+import { URL_ENDPOINTS } from './utils/endpoints';
 
 const App: React.FC = () => {
   return (
@@ -18,14 +19,17 @@ const App: React.FC = () => {
       <AuthProvider>
         <Router>
           <Routes>
-            <Route path="/" element={<AuthRedirect />} />
-            <Route path="/login" element={<AuthRedirect />} />
+            <Route path={URL_ENDPOINTS.ROOT} element={<AuthRedirect />} />
+            <Route path={URL_ENDPOINTS.LOGIN} element={<AuthRedirect />} />
 
             <Route
-              path="/dashboard/*"
+              path={URL_ENDPOINTS.DASHBOARD_NESTED}
               element={<ProtectedRoute element={<Dashboard />} />}
             />
-            <Route path="*" element={<Navigate to="/" />} />
+            <Route
+              path={URL_ENDPOINTS.ANY}
+              element={<Navigate to={URL_ENDPOINTS.ROOT} />}
+            />
           </Routes>
         </Router>
       </AuthProvider>

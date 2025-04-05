@@ -1,3 +1,4 @@
+import { URL_ENDPOINTS } from '@/utils/endpoints';
 import { CircleX, FilePlus2, ListFilter } from 'lucide-react';
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
@@ -22,7 +23,7 @@ const FilterIcons: React.FC<FilterIconsProps> = ({
         {showFilters ? <CircleX size={16} /> : <ListFilter size={16} />}
       </button>
       <button
-        onClick={() => navigate('/dashboard/consumptions/new')}
+        onClick={() => navigate(URL_ENDPOINTS.CONSUMPTION_NEW)}
         className="p-1 bg-blue-500 text-white rounded hover:bg-blue-600"
       >
         <FilePlus2 size={16} />
