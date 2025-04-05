@@ -200,7 +200,8 @@ export default function ConsumptionForm() {
                   : 'Select an activity type first'
               }
               disabled={!selectedActivity}
-              step="0.01"
+              step="0.05"
+              min="0"
             />
             {selectedActivity && (
               <div className="ml-2 bg-gray-200 text-gray-700 px-4 flex items-center rounded-lg">
@@ -286,7 +287,7 @@ export default function ConsumptionForm() {
           </button>
           <button
             type="button"
-            onClick={() => navigate('/dashboard/consumptions')}
+            onClick={() => navigate('/dashboard/consumptions/list')}
             className="flex-1 px-6 py-3 bg-gray-200 text-gray-700 rounded-lg hover:bg-gray-300 transition-colors focus:outline-none focus:ring-2 focus:ring-gray-400 focus:ring-opacity-50"
           >
             Cancel
