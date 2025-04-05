@@ -195,4 +195,5 @@ Log out from the application and end your session.
 - Give the user with admin role the authorization to add new activity  type, unit and products.
 - Refactor tables into reusable components to reduce redundancy
 - Add Sign up to create a user
+- Add languages
 
