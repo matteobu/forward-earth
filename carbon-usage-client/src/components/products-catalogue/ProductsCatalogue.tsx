@@ -172,7 +172,7 @@ const ProductCatalogue: React.FC = () => {
                     </div>
                     <div className="bg-gradient-to-br from-blue-50 to-blue-100 rounded-xl p-4 shadow-md">
                       <h4 className="text-lg font-bold text-blue-800 mb-3 border-b pb-2">
-                        Step Contribution Analysis
+                        Step Contribution Analysis per unit
                       </h4>
                       <div className="space-y-3">
                         <div className="flex justify-between items-center">
