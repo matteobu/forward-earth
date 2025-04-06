@@ -1,5 +1,5 @@
 import { URL_ENDPOINTS } from '@/utils/endpoints';
-import { CircleX, FilePlus2, ListFilter } from 'lucide-react';
+import { CircleX, ListFilter, SquarePlus } from 'lucide-react';
 import React from 'react';
 import { useNavigate } from 'react-router-dom';
 
@@ -18,15 +18,19 @@ const FilterIcons: React.FC<FilterIconsProps> = ({
     <div className="flex space-x-2">
       <button
         onClick={toggleFilters}
+        title={showFilters ? 'Close Filters' : 'Open Filters'}
         className="p-1 bg-gray-200 text-gray-800 rounded hover:bg-gray-300"
       >
         {showFilters ? <CircleX size={16} /> : <ListFilter size={16} />}
       </button>
       <button
-        onClick={() => navigate(URL_ENDPOINTS.CONSUMPTION_NEW)}
-        className="p-1 bg-blue-500 text-white rounded hover:bg-blue-600"
+        onClick={() =>
+          navigate(URL_ENDPOINTS.DASHBOARD + URL_ENDPOINTS.CONSUMPTION_NEW)
+        }
+        title="Add Consumption"
+        className="p-1 bg-gray-200 text-gray-800 rounded hover:bg-gray-300"
       >
-        <FilePlus2 size={16} />
+        <SquarePlus size={16} />
       </button>
     </div>
   );

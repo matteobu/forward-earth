@@ -119,7 +119,7 @@ const ProductionTable: React.FC = () => {
                   {formatNumber(record.total_units)}
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-600">
-                  {(record.production_efficiency * 100).toFixed(2)}%
+                  {(record.production_efficiency * 100).toFixed(1)}%
                 </td>
               </tr>
             ))}

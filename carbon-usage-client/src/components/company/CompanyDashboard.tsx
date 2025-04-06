@@ -90,16 +90,17 @@ const CompanyDashboard: React.FC = () => {
                 </p>
               </div>
               <div className="text-right">
-                <div className="text-sm text-white/80">Primary Expertise </div>
+                <div className="text-sm text-white/80">Primary Expertise:</div>
                 <div className="text-xl font-semibold text-white">
                   <p className="text-white/80 mt-2">
                     {companyData?.primary_expertise}
                   </p>
                   <div className="text-sm text-white/80 mt-2">
-                    Production and number step
+                    Process phase [nr.]
                   </div>
                   <p className="text-white/80 mt-2">
-                    {companyData?.production_step} [{companyData?.step_number}]
+                    {companyData?.production_step} [{companyData?.step_number}
+                    /5]
                   </p>
                 </div>
               </div>
@@ -134,28 +135,21 @@ const CompanyDashboard: React.FC = () => {
                 </div>
               </div>
             </div>
-
             <div className="bg-white rounded-3xl shadow-xl p-6">
-              <h2 className="text-xl font-semibold text-gray-800 mb-4">
+              <h3 className="text-lg font-semibold text-gray-800 mb-2">
                 Sustainability Metrics
-              </h2>
-              <div className="flex items-center justify-between">
-                <div className="text-center">
-                  <div className="text-3xl font-bold text-emerald-600">
-                    {companyData?.sustainability_score}
-                  </div>
-                  <div className="text-sm text-gray-600">
-                    Sustainability Score
-                  </div>
-                </div>
+              </h3>
+              <div className="text-3xl font-bold text-green-600">
+                {companyData?.sustainability_score}
               </div>
+              <p className="text-sm text-gray-600 mt-2">Sustainability Score</p>
             </div>
           </div>
 
           <div className="md:col-span-2 space-y-6">
             <div className="grid grid-cols-2 gap-6">
               <div className="bg-white rounded-3xl shadow-xl p-6">
-                <h3 className="text-lg font-semibold text-gray-800 mb-4">
+                <h3 className="text-lg font-semibold text-gray-800 mb-2">
                   Emissions Reduction
                 </h3>
                 <div className="text-3xl font-bold text-green-600">

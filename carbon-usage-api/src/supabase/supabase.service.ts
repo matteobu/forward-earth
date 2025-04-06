@@ -10,6 +10,7 @@ import {
 
 import { ActivityTypeTable } from '../activity-types/entities/activity-type.entity';
 import { SupabaseConsumptionDto } from './dto/create-consumption.dto';
+import { UpdateConsumptionDto } from 'src/consumption/dto/update-consumption.dto';
 
 dotenv.config();
 
@@ -289,7 +290,10 @@ export class SupabaseService {
     }
   }
 
-  async updateUserConsumption(id: number, patchConsumptionDto: any) {
+  async updateUserConsumption(
+    id: number,
+    patchConsumptionDto: UpdateConsumptionDto,
+  ) {
     try {
       const { data: currentConsumption, error: fetchError } =
         await this.supabase
@@ -306,7 +310,13 @@ export class SupabaseService {
         );
       }
 
-      const updateData: any = {};
+      const updateData: {
+        amount?: number;
+        co2_equivalent?: number;
+        date?: string;
+        activity_type_table_id?: number;
+        unit_id?: number;
+      } = {};
 
       if (patchConsumptionDto.amount !== undefined) {
         updateData.amount = patchConsumptionDto.amount;
@@ -320,19 +330,56 @@ export class SupabaseService {
         updateData.date = patchConsumptionDto.date;
       }
 
+      if (patchConsumptionDto.activity_type_table_id !== undefined) {
+        updateData.activity_type_table_id =
+          patchConsumptionDto.activity_type_table_id;
+      }
+
+      if (patchConsumptionDto.unit !== undefined) {
+        const { data: unitData, error: unitError } = await this.supabase
+          .from('UnitTable')
+          .select('id')
+          .eq('name', patchConsumptionDto.unit)
+          .single();
+
+        if (unitError) {
+          console.error('Error finding unit:', unitError);
+        } else if (unitData) {
+          // Use unit_id as per your schema
+          updateData.unit_id = unitData.id;
+        }
+      }
+
       if (Object.keys(updateData).length > 0) {
         const { data, error } = await this.supabase
           .from('ConsumptionTable')
           .update(updateData)
           .eq('id', id)
-          .select();
+          .select(
+            '*, UnitTable(id, name), ActivityTypeTable(id, name, emission_factor)',
+          );
 
         if (error) {
+          console.error('Update failed with error:', error);
           throw new Error(`Error updating consumption: ${error.message}`);
         }
 
-        return data[0] as Consumption;
+        if (!data || data.length === 0) {
+          console.error('No data returned after update');
+          throw new Error('No data returned after update');
+        }
+
+        const transformedConsumption = {
+          ...data[0],
+          unit_table: data[0].UnitTable,
+          activity_table: data[0].ActivityTypeTable,
+        };
+        delete transformedConsumption.UnitTable;
+        delete transformedConsumption.ActivityTypeTable;
+
+        return transformedConsumption as Consumption;
       }
+
       const transformedConsumption = {
         ...currentConsumption,
         unit_table: currentConsumption.UnitTable,

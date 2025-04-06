@@ -56,8 +56,9 @@ const ConsumptionTable: React.FC<ConsumptionTableProps> = ({
             renderSortIndicator={renderSortIndicator}
           />
           <tbody className="bg-white divide-y divide-gray-200">
-            {consumptions.map((consumption) => (
+            {consumptions.map((consumption, index) => (
               <ConsumptionTableRow
+                index={index}
                 key={consumption.id}
                 consumption={consumption}
                 isEditing={editingId === consumption.id}

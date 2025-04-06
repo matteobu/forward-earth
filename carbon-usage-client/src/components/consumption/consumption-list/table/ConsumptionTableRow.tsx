@@ -5,6 +5,7 @@ import { Ban, Pencil, Save, Trash2 } from 'lucide-react';
 import { formatNumber } from '@/utils/utils';
 
 interface ConsumptionRowProps {
+  index: number;
   consumption: Consumption;
   isEditing: boolean;
   editForm: {
@@ -24,6 +25,7 @@ interface ConsumptionRowProps {
 }
 
 const ConsumptionTableRow: React.FC<ConsumptionRowProps> = ({
+  index,
   consumption,
   isEditing,
   editForm,
@@ -36,7 +38,7 @@ const ConsumptionTableRow: React.FC<ConsumptionRowProps> = ({
   formatDate,
 }) => {
   const [allActivityType, setAllActivityType] = useState<ActivityType[]>([]);
-
+  console.log(index);
   useEffect(() => {
     const fetchData = async () => {
       if (isEditing) {
@@ -56,7 +58,7 @@ const ConsumptionTableRow: React.FC<ConsumptionRowProps> = ({
 
   if (isEditing) {
     return (
-      <tr key={consumption.activity_type_table_id} className="bg-indigo-50">
+      <tr key={index} className={index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
         <td className="px-6 py-4 whitespace-nowrap">
           <select
             name="activity_type_table_id"
@@ -121,7 +123,7 @@ const ConsumptionTableRow: React.FC<ConsumptionRowProps> = ({
   }
 
   return (
-    <tr className={consumption.id % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
+    <tr key={index} className={index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
       <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-800">
         {consumption.activity_table ? consumption.activity_table.name : 'N/A'}
       </td>

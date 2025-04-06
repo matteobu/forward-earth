@@ -8,7 +8,15 @@ import { useActivityTypeContext } from '@/contexts/ActivityTypeContext';
 import { getActivitiesByCategory } from '@/utils/utils';
 import { consumptionService } from '@/services/consumptionService';
 import { ACTIVITY_CATEGORIES } from '@/utils/constants';
-import { CircleDot, Droplet, Factory, Plane, Trash2, Zap } from 'lucide-react';
+import {
+  CalendarIcon,
+  CircleDot,
+  Droplet,
+  Factory,
+  Plane,
+  Trash2,
+  Zap,
+} from 'lucide-react';
 import { URL_ENDPOINTS } from '@/utils/endpoints';
 
 export default function ConsumptionForm() {
@@ -27,6 +35,14 @@ export default function ConsumptionForm() {
   const [co2Impact, setCo2Impact] = useState<number | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<string>('');
+
+  const handleCategoryChange = (category: string) => {
+    if (selectedCategory === category) {
+      setSelectedCategory('');
+      return;
+    }
+    setSelectedCategory(category);
+  };
 
   useEffect(() => {
     if (formData.activity_type_table_id) {
@@ -140,7 +156,7 @@ export default function ConsumptionForm() {
                     ? 'bg-indigo-100 shadow-md'
                     : 'bg-gray-50'
                 }`}
-              onClick={() => setSelectedCategory(category)}
+              onClick={() => handleCategoryChange(category)}
             >
               <div className="flex flex-col items-center">
                 <span className="text-2xl mb-2">
@@ -214,14 +230,19 @@ export default function ConsumptionForm() {
         {/* Date Input */}
         <div className="bg-gray-50 p-5 rounded-lg">
           <label className="block text-gray-700 font-medium mb-2">Date</label>
-          <input
-            type="date"
-            name="date"
-            value={formData.date}
-            onChange={handleChange}
-            className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-indigo-300 focus:border-indigo-500 transition-colors"
-            required
-          />
+          <div className="relative">
+            <input
+              type="date"
+              name="date"
+              value={formData.date}
+              onChange={handleChange}
+              className="w-full p-3 border rounded-lg focus:ring-2 focus:ring-indigo-300 focus:border-indigo-500 transition-colors appearance-none"
+              required
+            />
+            <div className="absolute inset-y-0 right-0 flex items-center pr-3 pointer-events-none">
+              <CalendarIcon className="h-5 w-5 text-indigo-500" />
+            </div>
+          </div>
         </div>
 
         {/* CO2 Impact Card */}
