@@ -49,9 +49,8 @@ export const calculateTotalCO2 = (consumptions: Consumption[]): number => {
 };
 
 export const formatNumber = (num: number) => {
-  const numStr = num.toFixed(1);
-  const [intPart, decPart] = numStr.split('.');
-  return `${intPart.replace(/\B(?=(\d{3})+(?!\d))/g, '.')},${decPart}`;
+  const numInt = Math.round(num);
+  return numInt.toString().replace(/\B(?=(\d{3})+(?!\d))/g, '.');
 };
 
 export const getCategoryForActivity = (activityName: string): string => {
