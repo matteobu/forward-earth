@@ -1,0 +1,27 @@
+version: '3'
+
+services:
+  api:
+    build:
+      context: ./carbon-usage-api
+    ports:
+      # Format is "HOST_PORT:CONTAINER_PORT"
+      # If port 3000 is already in use on your machine, change the first number:
+      # - '3001:3000'  # This would use port 3001 on your host machine
+      - '3000:3000'
+    volumes:
+      - ./carbon-usage-api:/app
+      - /app/node_modules
+
+  client:
+    build:
+      context: ./carbon-usage-client
+    ports:
+      # Similarly, if port 5173 is in use, you can change the first number:
+      # - '5174:5173'  # This would use port 5174 on your host machine
+      - '5173:5173'
+    volumes:
+      - ./carbon-usage-client:/app
+      - /app/node_modules
+    depends_on:
+      - api
