@@ -27,7 +27,7 @@ const FilterIcons: React.FC<FilterIconsProps> = ({
         onClick={() =>
           navigate(URL_ENDPOINTS.DASHBOARD + URL_ENDPOINTS.CONSUMPTION_NEW)
         }
-        title="Insert Consumption"
+        title="Add Consumption"
         className="p-1 bg-gray-200 text-gray-800 rounded hover:bg-gray-300"
       >
         <SquarePlus size={16} />

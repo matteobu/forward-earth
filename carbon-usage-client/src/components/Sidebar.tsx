@@ -104,7 +104,7 @@ export const NAV_ITEMS: NavItemOrDivider[] = [
     path: `${URL_ENDPOINTS.DASHBOARD}${URL_ENDPOINTS.CONSUMPTION_LIST}`,
   },
   {
-    title: 'Insert Consumption',
+    title: 'Add Consumption',
     icon: <SquarePlus size={20} className="text-gray-600" />,
     path: `${URL_ENDPOINTS.DASHBOARD}${URL_ENDPOINTS.CONSUMPTION_NEW}`,
   },
