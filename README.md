@@ -10,6 +10,14 @@ This project provides a complete solution for tracking and managing carbon usage
 - **Backend**: NestJS with TypeScript
 - **Database**: Supabase (PostgreSQL)
 
+### ✨ Features
+
+- User authentication for 5 companies
+- CO2 emissions tracking per activity
+- Consumption data management with filtering/sorting
+- Product and production catalogues
+- Company-specific dashboards and reports
+
 ## 🚀 Getting Started
 
 ### Installation
@@ -23,36 +31,94 @@ This project provides a complete solution for tracking and managing carbon usage
 
 2. Install dependencies:
    ```bash
-   npm install
+   npm run install:all
    ```
-
-### Running the Application
-
-#### Frontend
-
-```bash
-cd carbon-usage-client
-npm run start:dev
-```
-
-#### Backend
-
-```bash
-cd carbon-usage-api
-npm run start:dev
-```
 
 ### Environment Setup
 
-Create an `.env` file in the root directory with the following configuration:
+1. Create an `.env` file in the root directory with the following configuration and the info provided:
+
+2. Generate a secure random secret for your JWT_SECRET
+
+```bash
+openssl rand -base64 32
+```
+
+3. Change the value in the env file
 
 ```
 # Supabase Configuration
-SUPABASE_URL="YOUR_SUPABASE_URL"
-SUPABASE_KEY="YOUR_ANON_SUPABASE_KEY"
+SUPABASE_URL=you-supabase-url
+SUPABASE_KEY=your-anon-supabase-key
 
 # JWT Configuration
-JWT_SECRET="YOUR_JWT_SECRET_KEY" // generate a random alphanumeric string
-JWT_EXPIRATION=60m  # JWT token expiration time (1 hour)
+JWT_SECRET=your-random-secret
+JWT_EXPIRATION=60m
+```
 
+### Running the Application
+
+1. Run the application:
+   ```bash
+   npm run start:dev
+   ```
+
+### Folder Structure
+
+```​
+forward-earth/                           # Main project directory
+│
+├── carbon-usage-api/                    # Backend NestJS application
+│   ├── dist/                            # Compiled output
+│   ├── node_modules/                    # External dependencies
+│   ├── src/                             # Source code for the API
+│   │   ├── activity-types/              # Activity types module
+│   │   ├── auth/                        # Authentication module
+│   │   ├── companies/                   # Companies module
+│   │   ├── consumption/                 # Consumption tracking module
+│   │   ├── production/                  # Production module
+│   │   ├── products/                    # Products module
+│   │   ├── supabase/                    # Supabase database integration
+│   │   ├── units/                       # Units of measurement module
+│   │   ├── users/                       # User management module
+│   │   ├── app.module.ts                # Main application module
+│   │   └── main.ts                      # Application entry point
+│   ├── test/                            # Test files
+│   ├── .env                             # Environment variables
+│   ├── .env.template                    # Template for environment variables
+│   ├── .gitignore                       # Git ignore rules
+│   ├── .prettierrc                      # Prettier configuration
+│   ├── eslint.config.mjs                # ESLint configuration
+│   ├── nest-cli.json                    # NestJS CLI configuration
+│   ├── package-lock.json                # Dependency lock file
+│   ├── package.json                     # Project metadata and dependencies
+│   ├── tsconfig.build.json              # TypeScript build configuration
+│   └── tsconfig.json                    # TypeScript configuration
+│
+└── carbon-usage-client/                 # Frontend React application (Vite)
+    ├── node_modules/                    # External dependencies
+    ├── public/                          # Static assets and public files
+    ├── src/                             # Source code for the client application
+    │   ├── components/                  # React UI components
+    │   │   ├── company/                 # Company related components
+    │   │   ├── consumption/             # Consumption tracking components
+    │   │   ├── main-page/               # Main page components
+    │   │   ├── production/              # Production related components
+    │   │   ├── products-catalogue/      # Product catalog components
+    │   │   ├── AuthRedirect.tsx         # Auth redirect handler
+    │   │   ├── Dashboard.tsx            # Main dashboard view
+    │   │   ├── LoginForm.tsx            # User login component
+    │   │   ├── ProtectedRoute.tsx       # Route protection component
+    │   │   └── Sidebar.tsx              # Navigation sidebar
+    │   ├── contexts/                    # React context providers
+    │   ├── hooks/                       # Custom React hooks
+    │   ├── interfaces/                  # TypeScript interfaces and types
+    │   ├── services/                    # API service integration
+    │   ├── styles/                      # CSS and styling
+    │   ├── utils/                       # Utility functions
+    │   ├── App.css                      # Main application styles
+    │   ├── App.tsx                      # Main application component
+    │   ├── index.css                    # Global CSS styles
+    │   ├── main.tsx                     # Application entry point
+    │   └── vite-env.d.ts                # Vite environment type declarations
 ```
