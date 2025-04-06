@@ -122,3 +122,23 @@ forward-earth/                           # Main project directory
     │   ├── main.tsx                     # Application entry point
     │   └── vite-env.d.ts                # Vite environment type declarations
 ```
+
+### How to run tests from the root folder `forward-earth/`
+
+1. Run backend tests:
+
+```bash
+npm run test:api
+```
+
+2. Run frontend tests:
+
+```bash
+npm run test:client
+```
+
+3. Run all tests:
+
+```bash
+npm run test:all
+```
