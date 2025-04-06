@@ -1,5 +1,12 @@
 {
   "name": "forward-earth",
-  "version": "1.0.0",
-  "private": true
+  "private": true,
+  "version": "0.0.1",
+  "scripts": {
+    "install:all": "npm install --prefix carbon-usage-api && npm install --prefix carbon-usage-client",
+    "start:dev": "concurrently \"npm run start:dev --prefix carbon-usage-api\" \"npm run start:dev --prefix carbon-usage-client\""
+  },
+  "devDependencies": {
+    "concurrently": "^8.2.2"
+  }
 }
