@@ -85,12 +85,22 @@ const CompanyDashboard: React.FC = () => {
             <div className="flex justify-between items-center">
               <div>
                 <h1 className="text-3xl font-bold">{companyData?.name}</h1>
-                <p className="text-white/80 mt-2">{companyData?.location}</p>
+                <p className="text-white/80 mt-2">
+                  Location: {companyData?.location}
+                </p>
               </div>
               <div className="text-right">
                 <div className="text-sm text-white/80">Primary Expertise </div>
                 <div className="text-xl font-semibold text-white">
-                  {companyData?.primary_expertise}
+                  <p className="text-white/80 mt-2">
+                    {companyData?.primary_expertise}
+                  </p>
+                  <div className="text-sm text-white/80 mt-2">
+                    Production and number step
+                  </div>
+                  <p className="text-white/80 mt-2">
+                    {companyData?.production_step} [{companyData?.step_number}]
+                  </p>
                 </div>
               </div>
             </div>
