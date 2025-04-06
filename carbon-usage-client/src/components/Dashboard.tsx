@@ -7,10 +7,10 @@ import Sidebar from './Sidebar';
 import { ActivityTypeProvider } from '@/contexts/ActivityTypeContext';
 import { LogOut } from 'lucide-react';
 import MainPage from './main-page/MainPage';
-import ConsumptionDataCollection from './consumption/ConsumptionDataCollection';
 import ProductsCatalogue from './products-catalogue/ProductsCatalogue';
 import CompanyDashboard from './company/CompanyDashboard';
 import ProductionTable from './production/ProductionList';
+import { URL_ENDPOINTS } from '@/utils/endpoints';
 
 export default function Dashboard() {
   const { logout } = useAuth();
@@ -39,22 +39,23 @@ export default function Dashboard() {
           <ActivityTypeProvider>
             <Routes>
               <Route index element={<MainPage />} />
-              <Route path="consumptions/list" element={<ConsumptionList />} />
-              <Route path="consumptions/new" element={<ConsumptionForm />} />
               <Route
-                path="consumptions/data-collection"
-                element={<ConsumptionDataCollection />}
+                path={URL_ENDPOINTS.CONSUMPTION_LIST}
+                element={<ConsumptionList />}
               />
               <Route
-                path="consumptions/:id/edit"
+                path={URL_ENDPOINTS.CONSUMPTION_NEW}
                 element={<ConsumptionForm />}
               />
               <Route
-                path="products-catalogue"
+                path={URL_ENDPOINTS.PRODUCTS_CATALOGUE}
                 element={<ProductsCatalogue />}
               />
-              <Route path="production/list" element={<ProductionTable />} />
-              <Route path="company-dashboard" element={<CompanyDashboard />} />
+              <Route
+                path={URL_ENDPOINTS.PRODUCTION_LIST}
+                element={<ProductionTable />}
+              />
+              <Route    path={URL_ENDPOINTS.COMPANY_DASHBOARD} element={<CompanyDashboard />} />
             </Routes>
           </ActivityTypeProvider>
         </main>

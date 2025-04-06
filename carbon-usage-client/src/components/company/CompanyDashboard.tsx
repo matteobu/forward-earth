@@ -25,21 +25,6 @@ interface CompanyData {
   primary_expertise: string;
 }
 
-const MOCK_EMISSIONS_DATA = [
-  { month: 'Jan', actual: 105000, target: 110000 },
-  { month: 'Feb', actual: 100000, target: 105000 },
-  { month: 'Mar', actual: 95000, target: 100000 },
-  { month: 'Apr', actual: 90000, target: 95000 },
-  { month: 'May', actual: 85000, target: 90000 },
-  { month: 'Jun', actual: 80000, target: 85000 },
-  { month: 'Jul', actual: 75000, target: 80000 },
-  { month: 'Aug', actual: 70000, target: 75000 },
-  { month: 'Sep', actual: 65000, target: 70000 },
-  { month: 'Oct', actual: 60000, target: 65000 },
-  { month: 'Nov', actual: 55000, target: 60000 },
-  { month: 'Dec', actual: 50000, target: 55000 },
-];
-
 const CompanyDashboard: React.FC = () => {
   const [companyData, setCompanyData] = useState<CompanyData | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
@@ -241,3 +226,18 @@ const CompanyDashboard: React.FC = () => {
 };
 
 export default CompanyDashboard;
+
+const MOCK_EMISSIONS_DATA = [
+  { month: 'Jan', actual: 105000, target: 110000 },
+  { month: 'Feb', actual: 100000, target: 105000 },
+  { month: 'Mar', actual: 95000, target: 100000 },
+  { month: 'Apr', actual: 90000, target: 95000 },
+  { month: 'May', actual: 85000, target: 90000 },
+  { month: 'Jun', actual: 80000, target: 85000 },
+  { month: 'Jul', actual: 75000, target: 80000 },
+  { month: 'Aug', actual: 70000, target: 75000 },
+  { month: 'Sep', actual: 65000, target: 70000 },
+  { month: 'Oct', actual: 60000, target: 65000 },
+  { month: 'Nov', actual: 55000, target: 60000 },
+  { month: 'Dec', actual: 50000, target: 55000 },
+];

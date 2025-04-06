@@ -43,7 +43,7 @@ export const ActivityTypeProvider: React.FC<ActivityTypeProviderProps> = ({
       try {
         const fetchedActivityTypes =
           await activityTypeService.fetchAllActivityType();
-        // FIXME: This is conceptually wrong. The Activity Type should have a connection with uni_id so we can have the right info
+        // TODO: This is conceptually wrong. The Activity Type should have a connection with uni_id so we can have the right info
         // Now, I am using a mocked const to do the job: ACTIVITY_TYPE_UNIT_MOCKED
         // const fetchedUnit = await unitService.fetchAllUnit();
 

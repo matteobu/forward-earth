@@ -1,11 +1,9 @@
-const API_BASE_URL = 'http://localhost:3000';
+import { API_ENDPOINTS } from '../utils/endpoints';
 
 export const productionService = {
   fetchAllProductionBatches: async () => {
-    const url = `${API_BASE_URL}/production/`;
-
     try {
-      const response = await fetch(url, {
+      const response = await fetch(API_ENDPOINTS.PRODUCTION, {
         credentials: 'include',
       });
 

@@ -34,7 +34,7 @@ export class AuthController {
     }
   }
 
-  @Get('me')
+  @Get('user')
   async getProfile(@Req() req: Request) {
     const token = req.cookies['jwt'];
     if (!token) {

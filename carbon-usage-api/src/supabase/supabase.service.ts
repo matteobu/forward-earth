@@ -27,7 +27,6 @@ export class SupabaseService {
   // ***
   // USER ROUTE
   // ***
-  // Function to get user from Supabase by email
   async getUserByEmail(email: string) {
     const { data, error } = await this.supabase
       .from('Users')
@@ -362,7 +361,6 @@ export class SupabaseService {
       throw new Error(`Error deleting consumption: ${companyError.message}`);
     }
 
-    // FIXME:
     // eslint-disable-next-line @typescript-eslint/no-unsafe-return
     return companyData;
   }
@@ -379,7 +377,6 @@ export class SupabaseService {
       throw new Error(`Error deleting consumption: ${productsError.message}`);
     }
 
-    // FIXME:
     // eslint-disable-next-line @typescript-eslint/no-unsafe-return
     return productsData;
   }

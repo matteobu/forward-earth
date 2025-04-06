@@ -1,4 +1,3 @@
-// components/consumption/ui/ConsumptionHeader.tsx
 import { useUser } from '@/contexts/UserContext';
 import React from 'react';
 

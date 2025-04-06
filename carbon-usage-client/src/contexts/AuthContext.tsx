@@ -1,6 +1,7 @@
 import { AuthContextType, User } from '@/interfaces/interfaces';
 import { useUser } from './UserContext';
 import React, { createContext, useContext, useEffect, useState } from 'react';
+import { authService } from '@/services/authService';
 
 const AuthContext = createContext<AuthContextType | null>(null);
 
@@ -23,25 +24,16 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
   const checkAuthStatus = async () => {
     try {
       setLoading(true);
-      const response = await fetch('http://localhost:3000/auth/me', {
-        credentials: 'include',
-      });
 
-      if (response.ok) {
-        const data = await response.json();
+      const user = await authService.authUser();
 
-        setUser(data.user);
-        setUserContext(data.user);
-
-        setIsAuthenticated(true);
-      } else {
-        setUser(null);
-        setIsAuthenticated(false);
-      }
+      setUser(user);
+      setUserContext(user);
+      setIsAuthenticated(true);
     } catch (error) {
-      console.error('Failed to check auth status', error);
       setUser(null);
       setIsAuthenticated(false);
+      console.error('Authentication check failed:', error);
     } finally {
       setLoading(false);
     }
@@ -57,23 +49,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({
 
   const logout = async () => {
     try {
-      const response = await fetch('http://localhost:3000/auth/logout', {
-        method: 'POST',
-        credentials: 'include',
-      });
+      await authService.logout();
 
-      if (response.ok) {
-        console.log('Logout successful');
-      } else {
-        console.error('Logout failed on server');
-      }
-    } catch (error) {
-      console.error('Error during logout:', error);
-    } finally {
       setUser(null);
       setIsAuthenticated(false);
-
       window.location.href = '/login';
+    } catch (error) {
+      console.error('Error during logout:', error);
     }
   };
 

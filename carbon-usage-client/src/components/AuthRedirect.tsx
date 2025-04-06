@@ -1,13 +1,9 @@
-import React, { JSX } from 'react';
+import { useAuth } from '@/contexts/AuthContext';
 import { Navigate } from 'react-router-dom';
-import { useAuth } from '../contexts/AuthContext';
+import LoginForm from './LoginForm';
 import { URL_ENDPOINTS } from '@/utils/endpoints';
 
-interface ProtectedRouteProps {
-  element: JSX.Element;
-}
-
-const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ element }) => {
+export const AuthRedirect = () => {
   const { isAuthenticated, loading } = useAuth();
 
   if (loading) {
@@ -18,11 +14,9 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ element }) => {
     );
   }
 
-  if (!isAuthenticated) {
-    return <Navigate to={URL_ENDPOINTS.LOGIN} />;
-  }
-
-  return element;
+  return isAuthenticated ? (
+    <Navigate to={URL_ENDPOINTS.DASHBOARD} />
+  ) : (
+    <LoginForm />
+  );
 };
-
-export default ProtectedRoute;

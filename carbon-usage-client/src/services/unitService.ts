@@ -1,11 +1,9 @@
-const API_BASE_URL = 'http://localhost:3000';
+import { API_ENDPOINTS } from '../utils/endpoints';
 
 export const unitService = {
   fetchAllUnit: async () => {
-    const url = `${API_BASE_URL}/units/`;
-
     try {
-      const response = await fetch(url, {
+      const response = await fetch(API_ENDPOINTS.UNITS, {
         credentials: 'include',
       });
 

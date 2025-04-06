@@ -1,4 +1,3 @@
-// PaginationControls.tsx
 import { Consumption } from '@/utils/types';
 import React from 'react';
 
@@ -21,34 +20,28 @@ const PaginationControls: React.FC<PaginationControlsProps> = ({
   setItemsPerPage,
   handlePageChange,
 }) => {
-  // Generate page numbers to display
   const getPageNumbers = () => {
     const pageNumbers = [];
     const maxPagesToShow = 5;
 
     if (totalPages <= maxPagesToShow) {
-      // If we have 5 or fewer pages, show them all
       for (let i = 1; i <= totalPages; i++) {
         pageNumbers.push(i);
       }
     } else {
-      // Complex case with more than maxPagesToShow pages
       if (currentPage <= 3) {
-        // Near the start
         for (let i = 1; i <= 4; i++) {
           pageNumbers.push(i);
         }
         pageNumbers.push('...');
         pageNumbers.push(totalPages);
       } else if (currentPage >= totalPages - 2) {
-        // Near the end
         pageNumbers.push(1);
         pageNumbers.push('...');
         for (let i = totalPages - 3; i <= totalPages; i++) {
           pageNumbers.push(i);
         }
       } else {
-        // Somewhere in the middle
         pageNumbers.push(1);
         pageNumbers.push('...');
         pageNumbers.push(currentPage - 1);

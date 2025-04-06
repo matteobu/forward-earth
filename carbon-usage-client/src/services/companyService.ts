@@ -1,11 +1,9 @@
-const API_BASE_URL = 'http://localhost:3000';
+import { API_ENDPOINTS } from '../utils/endpoints';
 
 export const companyService = {
   fetchCompanyData: async (userId: number) => {
-    const url = `${API_BASE_URL}/companies/${userId}`;
-
     try {
-      const response = await fetch(url, {
+      const response = await fetch(`${API_ENDPOINTS.COMPANIES}${userId}`, {
         credentials: 'include',
       });
 

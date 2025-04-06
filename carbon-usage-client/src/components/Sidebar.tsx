@@ -14,6 +14,7 @@ import {
   NavItemOrDivider,
   SidebarProps,
 } from '@/interfaces/interfaces';
+import { URL_ENDPOINTS } from '@/utils/endpoints';
 
 const Sidebar: React.FC<SidebarProps> = ({ className = '' }) => {
   const navigate = useNavigate();
@@ -95,17 +96,17 @@ export const NAV_ITEMS: NavItemOrDivider[] = [
   {
     title: 'Dashboard',
     icon: <LayoutDashboard size={20} className="text-gray-600" />,
-    path: '/dashboard',
+    path: URL_ENDPOINTS.DASHBOARD,
   },
   {
     title: 'Consumptions List',
     icon: <TableProperties size={20} className="text-gray-500" />,
-    path: '/dashboard/consumptions/list',
+    path: `${URL_ENDPOINTS.DASHBOARD}${URL_ENDPOINTS.CONSUMPTION_LIST}`,
   },
   {
     title: 'Insert Consumption',
     icon: <SquarePlus size={20} className="text-gray-600" />,
-    path: '/dashboard/consumptions/new',
+    path: `${URL_ENDPOINTS.DASHBOARD}${URL_ENDPOINTS.CONSUMPTION_NEW}`,
   },
   {
     divider: true,
@@ -114,12 +115,12 @@ export const NAV_ITEMS: NavItemOrDivider[] = [
   {
     title: 'Products Catalogue',
     icon: <ShoppingBag size={20} className="text-gray-500" />,
-    path: '/dashboard/products-catalogue',
+    path: `${URL_ENDPOINTS.DASHBOARD}${URL_ENDPOINTS.PRODUCTS_CATALOGUE}`,
   },
   {
     title: 'Production List',
     icon: <FileText size={20} className="text-gray-500" />,
-    path: '/dashboard/production/list',
+    path: `${URL_ENDPOINTS.DASHBOARD}${URL_ENDPOINTS.PRODUCTION_LIST}`,
   },
   {
     divider: true,
@@ -128,6 +129,6 @@ export const NAV_ITEMS: NavItemOrDivider[] = [
   {
     title: 'Company Dashboard',
     icon: <Building2 size={20} className="text-gray-500" />,
-    path: '/dashboard/company-dashboard',
+    path: `${URL_ENDPOINTS.DASHBOARD}${URL_ENDPOINTS.COMPANY_DASHBOARD}`,
   },
 ];

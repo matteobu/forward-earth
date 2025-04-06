@@ -1,11 +1,8 @@
-// services/consumptionService.ts
+import { API_ENDPOINTS, URL_ENDPOINTS } from '../utils/endpoints';
 import { ConsumptionPatchPayload } from '@/utils/types';
 import { NavigateFunction } from 'react-router-dom';
 
-const API_BASE_URL = 'http://localhost:3000';
-
 export const consumptionService = {
-  // Retrieves user consumption data with support for pagination, sorting, and filtering
   fetchConsumptions: async (params: {
     userId: number;
     page?: number;
@@ -31,7 +28,7 @@ export const consumptionService = {
       activityType,
     } = params;
 
-    let url = `${API_BASE_URL}/consumption/${userId}`;
+    let url = `${API_ENDPOINTS.CONSUMPTION}${userId}`;
     const queryParams = new URLSearchParams();
 
     if (page) queryParams.append('page', page.toString());
@@ -69,9 +66,8 @@ export const consumptionService = {
     return JSON.parse(text);
   },
 
-  // Updates an existing consumption record with partial data
   updateConsumption: async (id: number, data: ConsumptionPatchPayload) => {
-    const response = await fetch(`${API_BASE_URL}/consumption/patch/${id}`, {
+    const response = await fetch(`${API_ENDPOINTS.CONSUMPTION_PATCH}${id}`, {
       method: 'PATCH',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(data),
@@ -85,9 +81,8 @@ export const consumptionService = {
     return await response.json();
   },
 
-  // Permanently removes a consumption record from the database
   deleteConsumption: async (id: number) => {
-    const response = await fetch(`${API_BASE_URL}/consumption/delete/${id}`, {
+    const response = await fetch(`${API_ENDPOINTS.CONSUMPTION_DELETE}${id}`, {
       method: 'DELETE',
       credentials: 'include',
     });
@@ -99,7 +94,6 @@ export const consumptionService = {
     return true;
   },
 
-  // Creates a new consumption record in the database
   createConsumption: async (
     data: {
       user_id: number;
@@ -128,7 +122,7 @@ export const consumptionService = {
         throw new Error(`Error: ${response.status}`);
       }
 
-      navigate('/dashboard/consumptions/list');
+      navigate(URL_ENDPOINTS.DASHBOARD + URL_ENDPOINTS.CONSUMPTION_LIST);
     } catch (error) {
       console.error('Failed to create consumption', error);
       setIsSubmitting(false);
