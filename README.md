@@ -56,7 +56,27 @@ JWT_SECRET=your-random-secret
 JWT_EXPIRATION=60m
 ```
 
-### Running the Application
+### Running the Application (Docker)
+
+From the root folder forward-earth/:
+Start the application
+```bash
+docker-compose up
+```
+Access the service
+
+```bash
+frontend: http://localhost:5173
+backend: http://localhost:3000
+```
+Stop the application
+```bash
+# Either press Ctrl+C in the terminal
+# Or run in a new terminal:
+docker-compose down
+```
+
+### Running the Application (node >20)
 
 1. Run the application:
    ```bash
